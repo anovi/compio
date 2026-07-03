@@ -121,7 +121,6 @@ export function createHelpPanel(view: EditorView): Panel {
             document.body.appendChild(panel.panel);
         },
         destroy: () => {
-            console.log('DESTROY')
             panel.remove();
         },
         // update: (update) => {

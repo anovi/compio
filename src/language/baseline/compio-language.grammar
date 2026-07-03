@@ -5,7 +5,6 @@
 // stay in `src/units/currencies-list.ts` instead of being pasted into this grammar.
 @external tokens numberWithUnitTokens from "./compio-number-with-unit-tokens.ts" {
 	Unit
-	CurrencySymbol
 	PercentSuffix
 }
 

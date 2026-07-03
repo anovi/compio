@@ -11,6 +11,7 @@ export {
 } from './unit-converter';
 export {
     longestRecognizedUnitSpelling,
+    longestRecognizedCurrencySymbolSpelling
 } from './all-units-vocabluary';
 export {
     getCurrencyDecimalPlaces,
@@ -19,7 +20,7 @@ export {
     getCurrencies,
     type CurrencyCode,
     type CurrencyEntry,
-} from './currency';
+} from './currency-api';
 export {
     normalizeUnit
 } from './unit-name-normalizer';

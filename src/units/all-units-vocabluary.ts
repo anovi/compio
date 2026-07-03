@@ -1,10 +1,9 @@
 import { PrefixTree } from "../lib/prefix-tree";
-import { CURRENCY_CODES, CURRENCY_SYMBOLS } from "./currencies-list";
+import { CURRENCY_CODES, CURRENCY_SYMBOLS } from "./currencies-vocabluaries";
 import { CANONICAL_UNIT_SPELLINGS } from "./unit-name-normalizer";
 
 
 const knownUnitSpellings = PrefixTree.fromWords([
-    // ...CURRENCY_SYMBOLS,
     ...CURRENCY_CODES,
     ...CANONICAL_UNIT_SPELLINGS
 ]);

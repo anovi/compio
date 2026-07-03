@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
 import { convertPackageUnitsConverter, units as _units } from './internals/convert-package';
-import { isCurrency } from './currency';
+import { isCurrency } from './currency-api';
 import type { MeasureEntry } from './types';
 
 export function canConvert(unitA: string, unitB: string): boolean {

@@ -1,11 +1,9 @@
 import { ExternalTokenizer, Stack, type InputStream } from '@lezer/lr';
 
-import { longestRecognizedUnitSpelling } from '../../units';
+import { longestRecognizedUnitSpelling, longestRecognizedCurrencySymbolSpelling } from '../../units';
 import { isIdentifierChar } from './identifier-char';
 import { PercentSuffix, Unit, Identifier } from './compio-language-parser.terms';
 import { COLON, EQUALS, SPACE } from './symbols';
-import { CURRENCY_SYMBOLS_SET } from '../../units/currencies-list';
-import { longestRecognizedCurrencySymbolSpelling } from '../../units/all-units-vocabluary';
 
 export type NumberWithUnitTokenizerTerms = {
   Unit: number;

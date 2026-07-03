@@ -85,7 +85,7 @@ export const calculatorFixtures: CalculatorFixture[] = [
   { name: 'percent exponent error', doc: '100 ^ 20%', expected: [{ error: 'Percentage must be used with +, -, or *.' }] },
   { name: 'percent modulo error', doc: '100 % 20%', expected: [{ error: 'Percentage must be used with +, -, or *.' }] },
   { name: 'percent standalone error', doc: '20%', expected: [{ error: 'Percentage must be used with +, -, or *.' }] },
-  
+
   { name: 'percent assigned to a variable and used in expression', doc: 'rate = 20%\n100 + rate', expected: [20, 120], expectedUnits: ['%', U] },
   { name: 'percent should not be aggregated', doc: '1\nrate = 5%\n100 + rate\nsum()',
     expected:      [1,   5, 105, 106],
@@ -528,4 +528,3 @@ export const calculatorFixtures: CalculatorFixture[] = [
     expectedUnits: ['USD', 'km', 'km'],
   },
 ];
-

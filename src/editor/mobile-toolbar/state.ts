@@ -74,15 +74,15 @@ export const SuggestionsStateField = StateField.define<OperationDef[]>({
         let innerMostNode = tree.resolveInner(point, -1);
 
         let nodeCur: NodeIterator|null = tree.resolveStack(point, -1);
-        const stack: string[] = []; // DEBUGGING INFO
+        // const stack: string[] = []; // DEBUGGING INFO
         const stackTypeIDs: number[] = [];
         while (nodeCur?.node)  {
-            stack.push(nodeCur.node.name); // DEBUGGING INFO
+            // stack.push(nodeCur.node.name); // DEBUGGING INFO
             stackTypeIDs.push(nodeCur.node.type.id);
 			nodeCur = nodeCur.next;
 		}
-        console.log(stack.join(' <-- ')); // DEBUGGING INFO
-        console.log(innerMostNode.name) // DEBUGGING INFO
+        // console.log(stack.join(' <-- ')); // DEBUGGING INFO
+        // console.log(innerMostNode.name) // DEBUGGING INFO
 
         const rules: SuggestionRule[]|undefined = superMap[innerMostNode.type.id];
         if (!rules) return NONE;

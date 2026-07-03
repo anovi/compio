@@ -1,8 +1,6 @@
-import { CURRENCIES, CURRENCY_CODES, CURRENCY_SYMBOLS_SET, type CurrencyCode, type CurrencyEntry } from './currencies-list';
+import { CURRENCIES, CURRENCY_SET, CURRENCY_SYMBOLS_SET, type CurrencyCode, type CurrencyEntry } from './currencies-vocabluaries';
 
-export type { CurrencyCode, CurrencyEntry } from './currencies-list';
-
-const CURRENCY_SET: ReadonlySet<string> = new Set(CURRENCY_CODES);
+export type { CurrencyCode, CurrencyEntry } from './currencies-vocabluaries';
 
 
 /** Fractional digits for display, derived from {@link CurrencyEntry.numberToBasic} (e.g. 100 → 2). */

@@ -1,5 +1,8 @@
 import Decimal from 'decimal.js';
 
+/** Parsed from `currencies-list.csv` at config load; inlined via `define` in `vite.config.ts`. */
+declare const __CURRENCIES__: readonly CurrencyEntry[];
+
 /** One circulating currency row (see `currencies-list.csv`). */
 export interface CurrencyEntry {
 	readonly code: string;

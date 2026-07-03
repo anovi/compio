@@ -39,7 +39,6 @@ export const emptyLineGutter = gutter({
     values.ranges.between(line.from, line.to, (from, _to, val) => {
       if (line.from === from) value = val;
     });
-    console.log(value)
     return value ? new ValueMarker(value) : null
   },
   initialSpacer: () => emptyMarker,

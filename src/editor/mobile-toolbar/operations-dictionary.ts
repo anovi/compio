@@ -59,8 +59,7 @@ export const OperationsDictionary: Record<Operation, OperationDef> = {
         sign: '( )',
         insert: {
             open: '(', close: ')',
-            selection(text, from, to) {
-                console.log(text, from, to)
+            selection(_text, from, to) {
                 if (from === to) return {from: from + 1, to: to + 1}
                 return { from: from + 1, to: to}
             },

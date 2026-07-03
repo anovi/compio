@@ -174,7 +174,6 @@ export const calcResultsPlugin = ViewPlugin.fromClass(
     private subscribeToCurrencyRateUpdate(pairKey: string, view: EditorView) {
       const pair = parsePairKey(pairKey);
       if (!pair) return;
-      console.log('Subscribe to', pairKey);
       return ratesStore.subscribe(pair.from, pair.to, (state) => {
         if (!state.entry) return;
         view.dispatch({ effects: CurrencyRateUpdated.of(null) })

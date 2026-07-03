@@ -176,11 +176,11 @@ function shouldResolveVariable(ctx: Ctx): boolean {
 
 /**
  * This config defines how to process node values.
- * 
+ *
  * If node's processor is `null` the node will be skipped.
- * 
+ *
  * When `{slice: true}` it will be taken as string as is.
- * 
+ *
  * If `props` is present, they will be calculated and passed to `process`, see {@link CalcDecisionPoint} type.
 */
 const decisionTree: Record<TermValue, CalcDecisionPoint> = {
@@ -196,7 +196,7 @@ const decisionTree: Record<TermValue, CalcDecisionPoint> = {
     [terms.ColonSign]: SKIP,
     [terms.Heading]: SKIP,
     [terms.PercentSuffix]: SKIP,
-    
+
     // Operators
     [terms.ConvertOp]: SKIP,
     [terms.TimesBinaryOp]: SLICE,
@@ -376,7 +376,7 @@ const decisionTree: Record<TermValue, CalcDecisionPoint> = {
             return value;
         },
     },
-    
+
     // Expressions
     [terms.MulExpression]: terms.AddExpression,
     [terms.ExpExpression]: terms.AddExpression,
@@ -565,12 +565,12 @@ export class MathCalculator implements Ctx {
     ratesAwaited: PairKey[] = [];
     bindings: Map<string, ExpressionResult> = new Map();
     cursor: TreeCursor;
-    
+
     currentNodeType(): TermValue { return this.stack[this.stack.length - 1] }
     parentNodeType(): TermValue { return this.stack[this.stack.length - 2] }
-    
+
     sliceDoc: (from: number, to?: number) => string;
-    
+
     private lineIndexes: number[];
     private currentLineIndex: number = 0;
     private currentLine: [number, number] = [-1, -1];
@@ -609,7 +609,7 @@ export class MathCalculator implements Ctx {
                 unit: unitB,
             }
         }
-        
+
         if (canConvert(unitA, unitB)) {
             const newVal = convertValue(value.n, unitA, unitB);
             return { n: newVal, unit: unitB };
@@ -630,7 +630,7 @@ export class MathCalculator implements Ctx {
     }
 
     private normalizeArg(cursor: TreeCursor, arg: ExpressionResult, baseUnit?: string ): ExpressionResult {
-        if (baseUnit && arg.unit && arg.unit !== baseUnit) {
+      if (baseUnit && arg.unit && arg.unit !== baseUnit) {
             if (!areUnitsCompatible(baseUnit, arg.unit)) {
                 return expressionError(
                     `Cannot combine ${baseUnit} and ${arg.unit}.`,
@@ -849,7 +849,7 @@ export class MathCalculator implements Ctx {
             const propDef = point.props[index];
             const isOptionalParam = Boolean('expect' in propDef && propDef.optional);
             let propResult: unknown = undefined;
-            
+
             if ('expect' in propDef) {
                 do {
                     const type = cursor.type.id as TermValue;
@@ -881,7 +881,7 @@ export class MathCalculator implements Ctx {
                             break;
                         }
                         values.push(val);
-                    } 
+                    }
                 } while (this.moveToNextSibling(cursor));
 
                 propResult = values;
@@ -902,7 +902,7 @@ export class MathCalculator implements Ctx {
                 ret = err;
                 break;
             }
-            
+
 
             props[propDef.key] = propResult;
 
@@ -925,5 +925,5 @@ export class MathCalculator implements Ctx {
         this.moveToParent(cursor);
 
         return ret;
-    } 
+    }
 }

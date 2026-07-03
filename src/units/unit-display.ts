@@ -1,4 +1,4 @@
-import { getCurrencies } from './currency';
+import { getCurrencies } from './currency-api';
 import { getMeasurementUnits } from './unit-converter';
 import type { MeasureEntry } from './types';
 

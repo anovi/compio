@@ -218,7 +218,7 @@ export function unitCompletionSite(
   pos: number,
 ): UnitCompletionSite | null {
   const tree = syntaxTree(state);
-  
+
   let boundaryPos = skipWhiteSpaceBackward(state, pos);
   const node = tree.resolveInner(boundaryPos, -1);
 
@@ -251,8 +251,9 @@ function optionsForSite(
   site: UnitCompletionSite,
   pos: number,
 ): readonly Completion[] {
-  const base =
-    site.kind === 'convert' ? unitCompletionOptionsForConvert : unitCompletionOptions;
+  const base = site.kind === 'convert'
+    ? unitCompletionOptionsForConvert
+    : unitCompletionOptions;
 
   if (site.kind !== 'convert') return base;
 
@@ -272,8 +273,9 @@ function optionsWithArgAdvance(
 ): readonly Completion[] {
   if (functionCallContextAt(state, from) == null) return options;
   return options.map((option) => {
-    const insert =
-      typeof option.apply === 'string' ? option.apply : option.label;
+    const insert = typeof option.apply === 'string'
+      ? option.apply
+      : option.label;
     return { ...option, apply: completionApplyWithArgAdvance(insert) };
   });
 }

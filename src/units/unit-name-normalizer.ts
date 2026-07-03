@@ -1,6 +1,6 @@
 import { unitsObject } from '../../node_modules/convert/dist/generated/parse-unit.js';
 
-import { CURRENCIES, type CurrencyEntry } from './currencies-list';
+import { type CurrencyEntry } from './types'; 
 
 /** Every unit spelling accepted by the `convert` package (names, symbols, aliases). */
 export const CANONICAL_UNIT_SPELLINGS = Object.freeze(Object.keys(unitsObject));
@@ -31,6 +31,7 @@ function buildCanonicalCurrencyByLower(
     map.set(lower, arr);
     if (unit.symbol) {
       if (unit.symbol === '$' && unit.code !== 'USD') continue;
+      if (normalizeMeasureUnit(unit.symbol)) continue;
       let arr = map.get(unit.symbol);
       if (!arr) arr = [];
       arr.push(unit.code);
@@ -40,8 +41,17 @@ function buildCanonicalCurrencyByLower(
   return map;
 }
 
-let currencies = buildCanonicalCurrencyByLower(new Map(), CURRENCIES);
-const canonicalUnitByLower = buildCanonicalUnitByLower(currencies, CANONICAL_UNIT_SPELLINGS);
+const units = buildCanonicalUnitByLower(new Map(), CANONICAL_UNIT_SPELLINGS);
+
+export function normalizeMeasureUnit(unit: string): string | string[] | null {
+  const candidates = units.get(unit.toLowerCase()) ?? null;
+  if (candidates == null || candidates.length === 0) return null;
+  if (candidates.length === 1) return candidates[0];
+  return candidates.find(c => c === unit) || candidates;
+}
+
+const CURRENCIES = __CURRENCIES__;
+const currencies = buildCanonicalCurrencyByLower(new Map(), CURRENCIES);
 
 /**
  * Returns canonical unit code (ISO currency or measurement unit spelling).
@@ -49,8 +59,9 @@ const canonicalUnitByLower = buildCanonicalUnitByLower(currencies, CANONICAL_UNI
  * E.g. "MS" can be either "Ms" or "ms".
  */
 export function normalizeUnit(unit: string): string | string[] | null {
-  const candidates = canonicalUnitByLower.get(unit.toLowerCase()) ?? null;
+  const candidates = currencies.get(unit.toLowerCase()) ??  units.get(unit.toLowerCase()) ?? null;
   if (candidates == null || candidates.length === 0) return null;
   if (candidates.length === 1) return candidates[0];
   return candidates.find(c => c === unit) || candidates;
 }
+
