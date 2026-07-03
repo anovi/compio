@@ -420,7 +420,13 @@ export const calculatorFixtures: CalculatorFixture[] = [
   },
   {
     name: 'incompatible units: length * currency',
-    doc: '10 cm * 2 EUR',
+    doc: '10 cm + 2 EUR',
+    expected: ['NaN'],
+    expectedUnits: ['EUR'],
+  },
+  {
+    name: 'incompatible units: currency * currency',
+    doc: '10 RUB * 2 EUR',
     expected: ['NaN'],
     expectedUnits: ['EUR'],
   },
@@ -429,6 +435,12 @@ export const calculatorFixtures: CalculatorFixture[] = [
     doc: 'length = 10 kg\nmass = 5 m\nlength + mass',
     expected: [10, 5, 'NaN'],
     expectedUnits: ['kg', 'm', 'm'],
+  },
+  {
+    name: 'currencis compatible with other units in multiplying: length * currency',
+    doc: '10 hours * 2 EUR',
+    expected: ['20'],
+    expectedUnits: ['EUR'],
   },
   // Wrong conversions
   {

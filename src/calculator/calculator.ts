@@ -663,6 +663,14 @@ export class MathCalculator implements Ctx {
                 }
                 return expressionError(PERCENT_ERROR, cursor, left.unit);
             }
+            else if (operator === '*') {
+                const leftIsCurrency = left.unit && isCurrency(left.unit);
+                const rightIsCurrency = right.unit && isCurrency(right.unit);
+                const baseUnit = leftIsCurrency && !rightIsCurrency
+                    ? left.unit
+                    : rightIsCurrency && !leftIsCurrency ? right.unit : null;
+                if (baseUnit) return { n: left.n.times(right.n), unit: baseUnit };
+            }
         }
 
         const baseUnit = this.getExpressionsBaseUnit(args);
