@@ -669,7 +669,13 @@ export class MathCalculator implements Ctx {
                 const baseUnit = leftIsCurrency && !rightIsCurrency
                     ? left.unit
                     : rightIsCurrency && !leftIsCurrency ? right.unit : null;
+                // currencies are compatible with other units in multiplying
+                // and produce a currency result
                 if (baseUnit) return { n: left.n.times(right.n), unit: baseUnit };
+            }
+            else if (operator === '/' && left.unit && right.unit) {
+                // division of the same units shoud produce a plain number
+                if (left.unit === right.unit) return { n: left.n.div(right.n) }
             }
         }
 

@@ -437,10 +437,16 @@ export const calculatorFixtures: CalculatorFixture[] = [
     expectedUnits: ['kg', 'm', 'm'],
   },
   {
-    name: 'currencis compatible with other units in multiplying: length * currency',
+    name: 'currencies are compatible with other units in multiplying',
     doc: '10 hours * 2 EUR',
     expected: ['20'],
     expectedUnits: ['EUR'],
+  },
+  {
+    name: 'division of the same units produces a plain number',
+    doc: '10 EUR / 10 EUR',
+    expected: ['1'],
+    expectedUnits: [undefined],
   },
   // Wrong conversions
   {
