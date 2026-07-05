@@ -3,6 +3,7 @@ import { Range } from "@codemirror/state";
 import { pairKey, RatesStore, type PairEntry, type PairKey } from "../rates-store";
 import type { CurrencyCode } from "../units";
 import type { CalcValue, MathCalculator } from "./calculator";
+import { TimeLength } from "./result-values";
 
 /** Currency rates referenced by fixtures below. Keep in sync with `expected` values. */
 const MOCK_RATES: Partial<Record<CurrencyCode, Partial<Record<CurrencyCode, number>>>> = {
@@ -46,7 +47,7 @@ export type CalculatorExpectedError = {
 };
 
 /** Per-row expected value: numeric result or an error. */
-export type CalculatorExpectedRow = number | string | CalculatorExpectedError;
+export type CalculatorExpectedRow = number | string | CalculatorExpectedError | TimeLength;
 
 export function isCalculatorExpectedError(
   row: CalculatorExpectedRow,
@@ -544,5 +545,11 @@ export const calculatorFixtures: CalculatorFixture[] = [
     doc: '10 USD\n20 km\nsum()',
     expected: [10, 20, { error: 'Cannot combine km and USD.' }],
     expectedUnits: ['USD', 'km', 'km'],
+  },
+  // Dates
+  {
+    name: 'operation two dates dates',
+    doc: '2026-01-20 - 2026-01-01',
+    expected: [new TimeLength(1641600000)],
   },
 ];

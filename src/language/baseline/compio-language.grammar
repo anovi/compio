@@ -90,7 +90,7 @@ ConvertOp { @specialize<Identifier, "IN" | "in" | "into" | "as" | "to"> }
 	Integer { @digit+ ((" " | "," | "_") @digit+)* exponentPart? }
 	Number { Integer | Float }
 	String { "\""![\"]*"\"" }
-	Date   { (@digit @digit | @digit @digit @digit @digit) "-" @digit @digit "-" @digit @digit }
+	Date { (@digit @digit | @digit @digit @digit @digit) "-" @digit @digit "-" @digit @digit }
 
 	@precedence { Date, Number }
 

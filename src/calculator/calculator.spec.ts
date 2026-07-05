@@ -15,6 +15,7 @@ import {
     type CalculatorExpectedRow,
 } from './calculator.spec.fixtures';
 import { printTree } from '../lib/tree';
+import { TimeLength } from './result-values';
 
 const parser = buildParser(grammarSource, {
 	moduleStyle: 'es',
@@ -58,12 +59,22 @@ function assertExpected(values: Range<CalcValue>[], assertions: CalculatorExpect
         }
 
         const actual = row.result;
-        const expectedDecimal = new Decimal(expected);
-        const match = (actual.isNaN() && expectedDecimal.isNaN()) || actual.eq(expectedDecimal);
-        assert.ok(
-            match,
-            `Row ${index}: expected ${expectedDecimal.toString()}, got ${actual.toString()}`
-        );
+        if (actual instanceof Decimal) { 
+            if (typeof expected !== 'number' && typeof expected !== 'string') throw 'Expected is not a number or NaN';
+            const expectedDecimal = new Decimal(expected);
+            const match = (actual.isNaN() && expectedDecimal.isNaN()) || actual.eq(expectedDecimal);
+            assert.ok(
+                match,
+                `Row ${index}: expected ${expectedDecimal.toString()}, got ${actual.toString()}`
+            );
+        }
+        else if (actual instanceof TimeLength) {
+            if (!(expected instanceof TimeLength)) throw 'Expected and actual are of different type';
+            assert.ok(
+                expected.length === actual.length,
+                `Row ${index}: expected ${expected.length}, got ${actual.length}`
+            );
+        }
     }
 }
 

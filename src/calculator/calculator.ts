@@ -13,11 +13,26 @@ import { isCurrency } from '../units';
 import { pairKey, type PairKey, type RatesStore } from '../rates-store';
 import { BUILTIN_FUNCTION_ALIASES, BUILTIN_FUNCTION_BY_NAME } from './builtin-fn-registry';
 import { builtinHandlers, groupAggregationHandlers } from './builtin-fn-handlers';
-import { isExpressionResultError, isExpressionResultPercent, type ExpressionResult, type ExpressionResultError } from './types';
+import {
+    isExpressionResultError,
+    isExpressionResultPercent,
+    type ExpressionResult,
+    type ExpressionResultDate,
+    type ExpressionResultError,
+    isExpressionResultTime,
+    isExpressionResultDate,
+    type ExpressionResultNumber,
+    isExpressionResultNumber,
+    isExpressionResultNumberUnit,
+    type ExpressionResultOk,
+    type ExpressionResultTime
+} from './types';
+import { TimeLength } from './result-values';
+import { performBinaryOperation } from './operations';
 
 /** Represents line's calculation result; can be binded to a name */
 export class CalcValue extends RangeValue {
-    readonly result: Decimal;
+    readonly result: Decimal | Date | TimeLength;
     readonly dependencies?: string[];
     readonly name?: string;
     readonly unit?: string;
@@ -28,7 +43,7 @@ export class CalcValue extends RangeValue {
     /** Means the expression is just a value assignment without calculation.  */
     readonly primitive?: boolean;
     constructor(
-        result: Decimal,
+        result: Decimal | Date | TimeLength,
         name?: string,
         dependencies?: string[],
         unit?: string,
@@ -56,11 +71,37 @@ function expressionError(message: string, cursor: TreeCursor, unit?: string): Ex
 }
 
 function findFirstOperandError(...operands: ExpressionResult[]): ExpressionResult | undefined {
-    return operands.find((op) => op && op.error != null);
+    return operands.find((op) => isExpressionResultError(op));
 }
 
 function calcValueFromExpr(expr: ExpressionResult, name?: string): CalcValue {
     const isError = isExpressionResultError(expr);
+    if (isExpressionResultTime(expr)) {
+        return new CalcValue(
+            expr.time,
+            name,
+            undefined,
+            undefined,
+            expr.error,
+            isError ? expr.from : undefined,
+            isError ? expr.to : undefined,
+            undefined,
+            !isError && expr.isPrimitive
+        )
+    }
+    if (isExpressionResultDate(expr)) {
+        return new CalcValue(
+            expr.date,
+            name,
+            undefined,
+            undefined,
+            expr.error,
+            isError ? expr.from : undefined,
+            isError ? expr.to : undefined,
+            undefined,
+            !isError && expr.isPrimitive
+        )
+    }
     const n = expr.n ?? new Decimal(NaN);
     return new CalcValue(
         n,
@@ -112,40 +153,11 @@ type CalcDecisionPoint =
     | TermValue;
 
 
-function isResultWithUnit(expr: ExpressionResult): expr is ExpressionResult & {unit: string} {
-    return Boolean(expr.unit && typeof expr.unit === 'string');
-}
-
-function isPercentOperand(expr: ExpressionResult): boolean {
-    return !isExpressionResultError(expr) && expr.isPercent === true;
+function isPercentOperand(expr: ExpressionResult): ReturnType<typeof isExpressionResultPercent> {
+    return !isExpressionResultError(expr) && isExpressionResultPercent(expr);
 }
 
 const PERCENT_ERROR = 'Percentage must be used with +, -, or *.';
-
-function applyPercentOperation(
-    cursor: TreeCursor,
-    operator: '+' | '-' | '*',
-    left: ExpressionResult,
-    right: ExpressionResult,
-): ExpressionResult {
-    if (operator === '+' && isPercentOperand(right) && !isPercentOperand(left)) {
-        const portion = left.n.times(right.n.div(100));
-        return { n: left.n.plus(portion), unit: left.unit };
-    }
-    if (operator === '-' && isPercentOperand(right) && !isPercentOperand(left)) {
-        const portion = left.n.times(right.n.div(100));
-        return { n: left.n.minus(portion), unit: left.unit };
-    }
-    if (operator === '*') {
-        if (isPercentOperand(right) && !isPercentOperand(left)) {
-            return { n: left.n.times(right.n.div(100)), unit: left.unit };
-        }
-        if (isPercentOperand(left) && !isPercentOperand(right)) {
-            return { n: right.n.times(left.n.div(100)), unit: right.unit };
-        }
-    }
-    return expressionError(PERCENT_ERROR, cursor, left.unit);
-}
 
 const IdentifierEvalContext: TermValue[] = [
     terms.ExpExpression,
@@ -190,7 +202,6 @@ const decisionTree: Record<TermValue, CalcDecisionPoint> = {
     [terms.Comment]: SKIP,
     [terms.Cpr]: SKIP,
     [terms.Opr]: SKIP,
-    [terms.Date]: SKIP,
     [terms.String]: SKIP,
     [terms.EqualSign]: SKIP,
     [terms.ColonSign]: SKIP,
@@ -202,6 +213,20 @@ const decisionTree: Record<TermValue, CalcDecisionPoint> = {
     [terms.TimesBinaryOp]: SLICE,
     [terms.PlusBinaryOp]: SLICE,
     [terms.PowBinaryOp]: SLICE,
+
+    // Date
+    [terms.Date]: {
+        process: (ctx): ExpressionResultDate | null => {
+            const raw = ctx.sliceDoc(ctx.cursor.from, ctx.cursor.to);
+            try {
+                const date = new Date(raw);
+                return { date }
+            } catch (error) {
+                // ignore
+            }
+            return null;
+        }
+    },
 
     // Numbers
     [terms.Number]: {
@@ -225,26 +250,26 @@ const decisionTree: Record<TermValue, CalcDecisionPoint> = {
         ],
         process: (
             _ctx,
-            props: { first: ExpressionResult|string|null, second: string|ExpressionResult|undefined }
-        ): ExpressionResult|null => {
+            props: { first: ExpressionResultNumber|string|null, second: string|ExpressionResultNumber|undefined }
+        ): ExpressionResultNumber|null => {
             let unit: string|null = null, n: Decimal|null = null;
             if (props.first && typeof props.first === 'string') {
                 unit = props.first;
-                n = (props.second as ExpressionResult).n;
+                n = (props.second as ExpressionResultNumber).n;
             }
             else if (props.second && typeof props.second === 'string') {
                 unit = props.second;
-                n = (props.first as ExpressionResult).n;
+                n = (props.first as ExpressionResultNumber).n;
             }
             if (n != null  && unit!= null) {
-                return { n, unit } as ExpressionResult;
+                return { n, unit } as ExpressionResultNumber;
             }
             return null;
         }
     },
     [terms.PercentLiteral]: {
         props: [{ key: 'number', expect: [terms.Number] }],
-        process: (_ctx, props: { number: ExpressionResult }): ExpressionResult => ({
+        process: (_ctx, props: { number: ExpressionResultNumber }): ExpressionResult => ({
             n: props.number.n,
             isPercent: true,
             isPrimitive: true,
@@ -426,7 +451,7 @@ const decisionTree: Record<TermValue, CalcDecisionPoint> = {
             let operator: Operator = params.operator || '+';
             let convertToUnit: string|undefined = undefined;
 
-            if (params.operatorBefore && params.operatorBefore === '-') {
+            if (params.operatorBefore && params.operatorBefore === '-' && isExpressionResultNumber(params.operand1)) {
                 params.operand1 = { ...params.operand1, n: params.operand1.n.negated() }
             }
 
@@ -437,8 +462,8 @@ const decisionTree: Record<TermValue, CalcDecisionPoint> = {
                 ? ctx.performOperation(ctx.cursor, operator, params.operand1, params.operand2)
                 : ctx.performOperation(ctx.cursor, operator, params.operand1);
 
-            if (convertToUnit) {
-                if (isResultWithUnit(result)) {
+            if (convertToUnit && isExpressionResultNumber(result)) {
+                if (isExpressionResultNumberUnit(result)) {
                     return ctx.convert(result, convertToUnit);
                 }
                 return { n: result.n, unit: convertToUnit };
@@ -475,9 +500,9 @@ const decisionTree: Record<TermValue, CalcDecisionPoint> = {
     [terms.Literal]: {
         props: [{
             key: 'value',
-            expect: [terms.NumberWithUnit, terms.PercentLiteral, terms.Number]
+            expect: [terms.NumberWithUnit, terms.PercentLiteral, terms.Number, terms.Date]
         }],
-        process: (ctx, params: { value: ExpressionResult }): ExpressionResult => {
+        process: (ctx, params: { value: ExpressionResult | ExpressionResultDate }): ExpressionResult => {
             if (isPercentOperand(params.value)) {
                 const parent = ctx.parentNodeType();
                 if (parent === terms.NoBinding) {
@@ -588,7 +613,7 @@ export class MathCalculator implements Ctx {
         return this.processTopLevelStatements(cursor);
 	}
 
-    convert(value: ExpressionResult, toUnit: string): ExpressionResult {
+    convert(value: ExpressionResultNumber, toUnit: string): ExpressionResult {
         if (value.error) return value;
         let rate: number = 1;
         const unitA = value.unit;
@@ -621,16 +646,17 @@ export class MathCalculator implements Ctx {
     private getExpressionsBaseUnit(args: ExpressionResult[]): string | undefined {
         let baseUnit: string | undefined;
         for (let i = args.length - 1; i >= 0; i--) {
-            if (args[i].unit) {
-                baseUnit = args[i].unit;
+            const elem = args[i];
+            if (isExpressionResultNumberUnit(elem)) {
+                baseUnit = elem.unit;
                 break;
             }
         }
         return baseUnit;
     }
 
-    private normalizeArg(cursor: TreeCursor, arg: ExpressionResult, baseUnit?: string ): ExpressionResult {
-      if (baseUnit && arg.unit && arg.unit !== baseUnit) {
+    normalizeArg<E extends ExpressionResultNumber | ExpressionResultTime |  ExpressionResultDate>(cursor: TreeCursor, arg: ExpressionResultOk, baseUnit?: string ): E | ExpressionResultError {
+        if (baseUnit && isExpressionResultNumberUnit(arg) && arg.unit !== baseUnit) {
             if (!areUnitsCompatible(baseUnit, arg.unit)) {
                 return expressionError(
                     `Cannot combine ${baseUnit} and ${arg.unit}.`,
@@ -638,79 +664,37 @@ export class MathCalculator implements Ctx {
                     baseUnit,
                 );
             }
-            return this.convert(arg, baseUnit);
+            return this.convert(arg, baseUnit) as E | ExpressionResultError;
         }
-        return arg;
+        return arg as E;
     }
 
-    performOperation(cursor: TreeCursor, operator: Operator, ...args: ExpressionResult[]): ExpressionResult {
+    performOperation(_cursor: TreeCursor, operator: Operator, ...args: ExpressionResult[]): ExpressionResult {
+        if (args.length === 0) throw Error ('Operation must have at least one operand!');
+
         const operandError = findFirstOperandError(...args);
         if (operandError) return operandError;
 
-        if (operator === '-' && args.length === 1) {
-            return { n: args[0].n.negated(), unit: args[0].unit };
+        if (operator === '-' && args.length === 1 && isExpressionResultNumber(args[0])) {
+            return { n: args[0].n.negated(), unit: args[0].unit } as ExpressionResultOk;
         }
 
         if (args.length === 1 && isPercentOperand(args[0])) {
             return args[0];
         }
 
-        if (args.length === 2) {
-            const [left, right] = args;
-            if (isPercentOperand(left) || isPercentOperand(right)) {
-                if (operator === '+' || operator === '-' || operator === '*') {
-                    return applyPercentOperation(cursor, operator, left, right);
-                }
-                return expressionError(PERCENT_ERROR, cursor, left.unit);
-            }
-            else if (operator === '*') {
-                const leftIsCurrency = left.unit && isCurrency(left.unit);
-                const rightIsCurrency = right.unit && isCurrency(right.unit);
-                const baseUnit = leftIsCurrency && !rightIsCurrency
-                    ? left.unit
-                    : rightIsCurrency && !leftIsCurrency ? right.unit : null;
-                // currencies are compatible with other units in multiplying
-                // and produce a currency result
-                if (baseUnit) return { n: left.n.times(right.n), unit: baseUnit };
-            }
-            else if (operator === '/' && left.unit && right.unit) {
-                // division of the same units shoud produce a plain number
-                if (left.unit === right.unit) return { n: left.n.div(right.n) }
-            }
-        }
-
         const baseUnit = this.getExpressionsBaseUnit(args);
 
-        const first = this.normalizeArg(cursor, args[0], baseUnit)
-        if (isExpressionResultError(first)) return first;
-        let result = first.n;
+        const first = args[0];
+        let left = first;
+        let result: ExpressionResult = first;
         for (let index = 1; index < args.length; index++) {
-            const exp = this.normalizeArg(cursor, args[index], baseUnit);
-            if (isExpressionResultError(exp)) return exp;
-            switch (operator) {
-                case '-':
-                    result = result.minus(exp.n);
-                    break;
-                case '+':
-                    result = result.plus(exp.n);
-                    break;
-                case '%':
-                    result = result.mod(exp.n);
-                    break;
-                case '*':
-                    result = result.times(exp.n);
-                    break;
-                case '/':
-                    result = result.div(exp.n);
-                    break;
-                case '^':
-                    result = result.pow(exp.n);
-                    break;
-                default:
-                    return expressionError(`Unknown operator "${operator}"`, cursor);
-            }
+            const right = args[index]
+            result = performBinaryOperation(operator, left, right, this, baseUnit);
+            if (isExpressionResultError(result)) return result;
+            left = result;
         }
-        return { n: result, unit: baseUnit };
+        return result!;
     }
 
     normalizeOperands(cursor: TreeCursor, args: ExpressionResult[]): ExpressionResult[] {
@@ -775,10 +759,21 @@ export class MathCalculator implements Ctx {
 					skipLineFrom = this.currentLine[0];
 					continue;
 				}
-				this.pushGroupLineResult({
-					n: range.value.result,
-					unit: range.value.unit,
-				});
+                const value = range.value;
+                if (value.result instanceof Date) {
+                    this.pushGroupLineResult({
+                        date: value.result,
+                    });
+                } else if (value.result instanceof TimeLength) {
+                    this.pushGroupLineResult({
+                        time: value.result,
+                    });
+                } else {
+                    this.pushGroupLineResult({
+                        n: value.result,
+                        unit: value.unit,
+                    });
+                }
 			}
 			else if (typeof range === 'object' && 'n' in range) {
 				const expr = range as ExpressionResult;

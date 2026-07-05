@@ -631,4 +631,18 @@ expectedTree: `CalcDoc
           Unit
           Number`,
 },
+// Dates
+{
+name: 'subtraction of dates',
+doc: '2026-01-20 - 2026-01-01',
+expectedTree: `CalcDoc
+  StatementGroup
+    NoBinding
+      AddExpression
+        Literal
+          Date
+        PlusBinaryOp
+        Literal
+          Date`,
+},
 ];
