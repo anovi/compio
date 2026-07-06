@@ -10,7 +10,7 @@ import {
   type EditorView,
   type ViewUpdate,
 } from '@codemirror/view'
-import { CalcValue } from '../../calculator'
+import { CalcValue, TimeLength } from '../../calculator'
 import { isMobileDevice } from '../../lib/mobile-device'
 import { calcResultHoverTooltip } from './result-tooltip'
 import { copyTextToClipboard } from '../clipboard'
@@ -38,7 +38,14 @@ class ResultWidget extends WidgetType {
     const a = this.value;
     const b = other.value;
     if (a.error !== b.error || a.name !== b.name || a.unit !== b.unit) return false;
+    if (a.result.constructor !== b.result.constructor) return false;
     if (a.error != null) return true;
+    if (a.result instanceof Date && b.result instanceof Date) {
+      return a.result.getTime() === b.result.getTime();
+    }
+    if (a.result instanceof TimeLength && b.result instanceof TimeLength) {
+      return a.result.length === b.result.length;
+    }
     return a.result != null && b.result != null && a.result.eq(b.result);
   }
 

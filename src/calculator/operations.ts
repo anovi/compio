@@ -206,7 +206,7 @@ addRule('-', {
     handler: numbersBinaryHandler.bind(null, 'minus'),
 })
 addRule('-', {
-    left: [ResultType.number],
+    left: [ResultType.number, ResultType.measure, ResultType.currency],
     right: [ResultType.percent],
     handler: percentPlusBinaryHandler.bind(null, 'minus'),
 })

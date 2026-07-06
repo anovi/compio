@@ -7,7 +7,8 @@ import Decimal from 'decimal.js';
 import grammarSource from '../language/baseline/compio-language.grammar?raw';
 import { createIdentifierTokensTokenizer } from '../language/baseline/compio-identifier-tokens';
 import { createNumberWithUnitTokensTokenizer } from '../language/baseline/compio-number-with-unit-tokens';
-import { CalcValue, MathCalculator } from './calculator';
+import { MathCalculator } from './calculator';
+import { CalcValue } from './calc-range-value';
 import {
     calculatorFixtures,
     createMockRatesStore,

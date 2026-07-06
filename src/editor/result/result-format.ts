@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
 
-import { CalcValue } from '../../calculator'
+import { CalcValue, TimeLength } from '../../calculator'
 import {
     formatUnitFullName,
     getMeasureDisplayDecimalPlaces,
@@ -38,7 +38,7 @@ function formatNumber(n: Decimal, decimalPlaces?: number): string {
     return addThousandsSeparators(raw)
 }
 
-function decimalPlacesForValue(value: CalcValue): number | undefined {
+function decimalPlacesForValue(value: CalcValue<Decimal>): number | undefined {
     const unit = value.unit;
     if (!unit) return undefined;
     if (isCurrency(unit)) return getCurrencyDecimalPlaces(unit);
@@ -73,23 +73,44 @@ export type ResultTooltipContent = {
 export function getResultTooltipContent(value: CalcValue): ResultTooltipContent | null {
     if (value.error != null) return null
     const n = value.result
-    if (n == null || n.isNaN()) return { value: 'NaN' }
-    const content: ResultTooltipContent = {
-        name: value.name,
-        value: formatHighPrecision(n),
+
+    const content: ResultTooltipContent = { value: ''}
+
+    if (n instanceof Date) {
+        content.value = n.toDateString();
     }
+
+    if (n instanceof TimeLength) {
+        content.value = n.toString();
+    }
+
+    if (n instanceof Decimal) {
+        content.value = n.toString();
+        if (n == null || n.isNaN()) return { value: 'NaN' };
+        content.name = value.name;
+        content.value = formatHighPrecision(n);
+    }
+
     if (value.unit) {
-        content.unit = formatUnitFullName(unitSpellingForDisplay(value.unit))
+        content.unit = formatUnitFullName(unitSpellingForDisplay(value.unit));
     }
-    return content
+    return content;
 }
 
 /** Formatted numeric result and unit suffix, e.g. `26.5` or `1.234 usd`. */
 export function formatResult(value: CalcValue): string {
     const n = value.result;
-    if (n == null || n.isNaN()) return 'NaN';
 
-    const formatted = formatNumber(n, decimalPlacesForValue(value));
+    if (n instanceof Date) {
+        return n.toDateString();
+    }
+
+    if (n instanceof TimeLength) {
+        return n.toString()
+    }
+    
+    if (n == null || n.isNaN()) return 'NaN';
+    const formatted = formatNumber(n, decimalPlacesForValue(value as CalcValue<Decimal>));
     // const formatted = n.toDecimalPlaces(6).toString();
     return value.unit ? `${formatted} ${value.unit}` : formatted;
 }

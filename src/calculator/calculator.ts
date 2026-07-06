@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
 import { TreeCursor } from '@lezer/common';
-import { RangeValue, Range } from "@codemirror/state";
+import { Range } from "@codemirror/state";
 
 import { terms, type TermValue } from '../language';
 import {
@@ -18,53 +18,18 @@ import {
     isExpressionResultPercent,
     type ExpressionResult,
     type ExpressionResultDate,
-    type ExpressionResultError,
-    isExpressionResultTime,
-    isExpressionResultDate,
-    type ExpressionResultNumber,
+    type ExpressionResultError, type ExpressionResultNumber,
     isExpressionResultNumber,
     isExpressionResultNumberUnit,
     type ExpressionResultOk,
-    type ExpressionResultTime
+    type ExpressionResultTime,
+    type ExpressionNumericResult
 } from './types';
 import { TimeLength } from './result-values';
 import { performBinaryOperation } from './operations';
+import { CalcValue, calcValueFromExpr } from './calc-range-value';
 
-/** Represents line's calculation result; can be binded to a name */
-export class CalcValue extends RangeValue {
-    readonly result: Decimal | Date | TimeLength;
-    readonly dependencies?: string[];
-    readonly name?: string;
-    readonly unit?: string;
-    readonly error?: string;
-    readonly errorFrom?: number;
-    readonly errorTo?: number;
-    readonly unitChoices?: readonly string[];
-    /** Means the expression is just a value assignment without calculation.  */
-    readonly primitive?: boolean;
-    constructor(
-        result: Decimal | Date | TimeLength,
-        name?: string,
-        dependencies?: string[],
-        unit?: string,
-        error?: string,
-        errorFrom?: number,
-        errorTo?: number,
-        unitChoices?: readonly string[],
-        isPrimitive?: boolean,
-    ) {
-        super();
-        this.result = result;
-        this.name = name;
-        this.dependencies = dependencies;
-        this.unit = unit;
-        this.error = error;
-        this.errorFrom = errorFrom;
-        this.errorTo = errorTo;
-        this.unitChoices = unitChoices;
-        this.primitive = isPrimitive;
-    }
-}
+
 
 function expressionError(message: string, cursor: TreeCursor, unit?: string): ExpressionResultError {
     return { n: new Decimal(NaN), unit, error: message, from: cursor.from, to: cursor.to };
@@ -72,48 +37,6 @@ function expressionError(message: string, cursor: TreeCursor, unit?: string): Ex
 
 function findFirstOperandError(...operands: ExpressionResult[]): ExpressionResult | undefined {
     return operands.find((op) => isExpressionResultError(op));
-}
-
-function calcValueFromExpr(expr: ExpressionResult, name?: string): CalcValue {
-    const isError = isExpressionResultError(expr);
-    if (isExpressionResultTime(expr)) {
-        return new CalcValue(
-            expr.time,
-            name,
-            undefined,
-            undefined,
-            expr.error,
-            isError ? expr.from : undefined,
-            isError ? expr.to : undefined,
-            undefined,
-            !isError && expr.isPrimitive
-        )
-    }
-    if (isExpressionResultDate(expr)) {
-        return new CalcValue(
-            expr.date,
-            name,
-            undefined,
-            undefined,
-            expr.error,
-            isError ? expr.from : undefined,
-            isError ? expr.to : undefined,
-            undefined,
-            !isError && expr.isPrimitive
-        )
-    }
-    const n = expr.n ?? new Decimal(NaN);
-    return new CalcValue(
-        n,
-        name,
-        undefined,
-        isExpressionResultPercent(expr) ? '%' : expr.unit,
-        expr.error,
-        isError ? expr.from : undefined,
-        isError ? expr.to : undefined,
-        isError ? expr.unitChoices : undefined,
-        !isError && expr.isPrimitive
-    );
 }
 
 type Operator = '-' | '+' | '/' | '*' | '%' | '^';
@@ -127,7 +50,7 @@ type Ctx = {
     sliceDoc: (from: number, to: number) => string,
     convert(value: ExpressionResult, toUnit: string): ExpressionResult,
     performOperation(cursor: TreeCursor, operator: Operator, ...args: ExpressionResult[]): ExpressionResult,
-    normalizeOperands(cursor: TreeCursor, args: ExpressionResult[]): ExpressionResult[],
+    normalizeOperands(cursor: TreeCursor, args: ExpressionNumericResult[]): ExpressionNumericResult[],
     getGroupLineResults(): readonly ExpressionResult[],
 }
 
@@ -189,11 +112,12 @@ function shouldResolveVariable(ctx: Ctx): boolean {
 /**
  * This config defines how to process node values.
  *
- * If node's processor is `null` the node will be skipped.
+ * If node's processor has SKIP value, the node will be skipped.
  *
- * When `{slice: true}` it will be taken as string as is.
+ * When is SLICE it will be taken as string.
  *
- * If `props` is present, they will be calculated and passed to `process`, see {@link CalcDecisionPoint} type.
+ * If `props` is present, they will be calculated and passed to `process` handler,
+ * see {@link CalcDecisionPoint} type.
 */
 const decisionTree: Record<TermValue, CalcDecisionPoint> = {
     [terms.CalcDoc]: SKIP,
@@ -276,7 +200,7 @@ const decisionTree: Record<TermValue, CalcDecisionPoint> = {
         }),
     },
 
-    // ID of a variable or a function
+    // Name of a variable or a function
     [terms.Identifier]: {
         process: (ctx): undefined|string|ExpressionResult => {
             const name = ctx.sliceDoc(ctx.cursor.from, ctx.cursor.to);
@@ -304,6 +228,13 @@ const decisionTree: Record<TermValue, CalcDecisionPoint> = {
             const def = BUILTIN_FUNCTION_BY_NAME.get(props.id);
             if (!def) return expressionError(`Unknown function "${props.id}".`, ctx.cursor);
             const canonicalName = BUILTIN_FUNCTION_ALIASES.get(props.id) ?? props.id;
+            for (let index = 0; index < args.length; index++) {
+                const arg = args[index];
+                if (!isExpressionResultNumber(arg)) {
+                    return expressionError(`Argument should be a number.`, ctx.cursor);
+                }
+            }
+            const numericArgs = args as ExpressionResultNumber[]
             if (def.aggregatesGroup) {
                 if (args.length > 0) {
                     return expressionError(`${props.id}() takes no arguments.`, ctx.cursor);
@@ -312,10 +243,14 @@ const decisionTree: Record<TermValue, CalcDecisionPoint> = {
                 if (!handler) return null;
                 // Percents should be ignored by aggregation functions
                 return handler(
-                    ctx.getGroupLineResults().filter(res => !('unit' in res && res.unit === '%')),
+                    ctx.getGroupLineResults().filter(
+                        (res): res is ExpressionResultNumber => {
+                            return 'n' in res && !('unit' in res && res.unit === '%')
+                        }
+                    ),
                     {
                         cursor: ctx.cursor,
-                        combineAdd: (...operands) => ctx.performOperation(ctx.cursor, '+', ...operands),
+                        combineAdd: (...operands) => ctx.performOperation(ctx.cursor, '+', ...operands) as ExpressionNumericResult,
                         normalizeArgs: (operands) => ctx.normalizeOperands(ctx.cursor, operands),
                         expressionError: (message) => expressionError(message, ctx.cursor),
                     }
@@ -334,7 +269,7 @@ const decisionTree: Record<TermValue, CalcDecisionPoint> = {
             }
             const builtinHandler = builtinHandlers.get(props.id);
             if (!builtinHandler) return null;
-            return builtinHandler(args);
+            return builtinHandler(numericArgs);
         }
     },
     [terms.ArgList]: {
@@ -697,8 +632,8 @@ export class MathCalculator implements Ctx {
         return result!;
     }
 
-    normalizeOperands(cursor: TreeCursor, args: ExpressionResult[]): ExpressionResult[] {
-        const operandError = findFirstOperandError(...args);
+    normalizeOperands(cursor: TreeCursor, args: ExpressionNumericResult[]): ExpressionNumericResult[] {
+        const operandError = findFirstOperandError(...args) as ExpressionNumericResult | undefined;
         if (operandError) return [operandError];
 
         const baseUnit = this.getExpressionsBaseUnit(args);

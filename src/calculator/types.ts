@@ -58,6 +58,7 @@ export type ExpressionResultError = {
 export type ExpressionResultOk = ExpressionResultNumber | ExpressionResultDate | ExpressionResultTime;
 
 export type ExpressionResult = ExpressionResultOk | ExpressionResultError;
+export type ExpressionNumericResult = ExpressionResultNumber | ExpressionResultError;
 
 export function isExpressionResultError (res: unknown): res is ExpressionResultError  {
     return Boolean(typeof res === 'object' && res !== null && 'error' in res && res.error);

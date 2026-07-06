@@ -2,19 +2,19 @@ import Decimal from 'decimal.js';
 import type { TreeCursor } from '@lezer/common';
 
 import { BUILTIN_FUNCTIONS } from './builtin-fn-registry';
-import type { ExpressionResult, ExpressionResultError } from './types';
+import type { ExpressionNumericResult, ExpressionResult, ExpressionResultError } from './types';
 
-export type BuiltinHandler = (args: ExpressionResult[]) => ExpressionResult | null;
+export type BuiltinHandler = (args: ExpressionNumericResult[]) => ExpressionResult | null;
 
 export type GroupAggregationDeps = {
   cursor: TreeCursor;
-  combineAdd: (...args: ExpressionResult[]) => ExpressionResult;
-  normalizeArgs: (args: ExpressionResult[]) => ExpressionResult[];
+  combineAdd: (...args: ExpressionNumericResult[]) => ExpressionNumericResult;
+  normalizeArgs: (args: ExpressionNumericResult[]) => ExpressionNumericResult[];
   expressionError: (message: string) => ExpressionResultError;
 };
 
 export type GroupAggregationHandler = (
-  args: ExpressionResult[],
+  args: ExpressionNumericResult[],
   deps: GroupAggregationDeps,
 ) => ExpressionResult;
 
@@ -40,7 +40,7 @@ function ternary(method: (a: Decimal, b: Decimal, c: Decimal) => Decimal): Built
 }
 
 // Not wrapped
-function stripUnit(args: ExpressionResult[]): ExpressionResult | null {
+function stripUnit(args: ExpressionNumericResult[]): ExpressionResult | null {
   if (args.length !== 1) return null;
   return { n: args[0].n };
 }
@@ -59,21 +59,21 @@ function nthRoot(x: Decimal, n: Decimal): Decimal {
   return x.pow(inv);
 }
 
-function groupSum(args: ExpressionResult[], deps: GroupAggregationDeps): ExpressionResult {
+function groupSum(args: ExpressionNumericResult[], deps: GroupAggregationDeps): ExpressionNumericResult {
   if (args.length === 0) return { n: new Decimal(0) };
   return deps.combineAdd(...args);
 }
 
-function groupAverage(args: ExpressionResult[], deps: GroupAggregationDeps): ExpressionResult {
+function groupAverage(args: ExpressionNumericResult[], deps: GroupAggregationDeps): ExpressionNumericResult {
   if (args.length === 0) {
     return deps.expressionError('average() needs at least one preceding line');
   }
-  const summed = deps.combineAdd(...args);
+  const summed = deps.combineAdd(...args) as ExpressionNumericResult;
   if ('error' in summed && summed.error != null) return summed;
   return { n: summed.n.div(args.length), unit: summed.unit };
 }
 
-function groupMedian(args: ExpressionResult[], deps: GroupAggregationDeps): ExpressionResult {
+function groupMedian(args: ExpressionNumericResult[], deps: GroupAggregationDeps): ExpressionNumericResult {
   if (args.length === 0) {
     return deps.expressionError('median() needs at least one preceding line');
   }
