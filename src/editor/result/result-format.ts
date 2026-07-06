@@ -38,6 +38,30 @@ function formatNumber(n: Decimal, decimalPlaces?: number): string {
     return addThousandsSeparators(raw)
 }
 
+const MS = 1;
+const SECOND = 1000;
+const MINUTE = SECOND * 60;
+const HOUR = MINUTE * 60;
+const DAY = HOUR * 24;
+// const WEEK = DAY * 7;
+const MONTH = DAY * 30;
+const YEAR = DAY * 365;
+const timeUnitName = ['ms', 's', 'm', 'h', 'd', 'm', 'year'];
+const timeUnitLength = [MS, SECOND, MINUTE, HOUR, DAY, MONTH, YEAR];
+
+function formatTimeLength(n: Decimal): string {
+    let result = '';
+    for (let index = timeUnitLength.length-1; index > 0; index--) {
+        const length = timeUnitLength[index];
+        const int = n.div(new Decimal(length)).floor();
+        if (int.gt(0)) {
+            result += `${int.toString()} ${timeUnitName[index]} `;
+            n = n.minus(int.times(length));
+        }
+    }
+    return result.trim();
+}
+
 function decimalPlacesForValue(value: CalcValue<Decimal>): number | undefined {
     const unit = value.unit;
     if (!unit) return undefined;
@@ -81,7 +105,7 @@ export function getResultTooltipContent(value: CalcValue): ResultTooltipContent 
     }
 
     if (n instanceof TimeLength) {
-        content.value = n.toString();
+        content.value = formatTimeLength(new Decimal(n.length))
     }
 
     if (n instanceof Decimal) {
@@ -106,9 +130,9 @@ export function formatResult(value: CalcValue): string {
     }
 
     if (n instanceof TimeLength) {
-        return n.toString()
+        return formatTimeLength(new Decimal(n.length));
     }
-    
+
     if (n == null || n.isNaN()) return 'NaN';
     const formatted = formatNumber(n, decimalPlacesForValue(value as CalcValue<Decimal>));
     // const formatted = n.toDecimalPlaces(6).toString();
