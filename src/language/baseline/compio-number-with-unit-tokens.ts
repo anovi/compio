@@ -3,30 +3,17 @@ import { ExternalTokenizer, Stack, type InputStream } from '@lezer/lr';
 import { longestRecognizedUnitSpelling, longestRecognizedCurrencySymbolSpelling } from '../../units';
 import { isIdentifierChar } from './identifier-char';
 import { PercentSuffix, Unit, Identifier } from './compio-language-parser.terms';
-import { COLON, EQUALS, SPACE } from './symbols';
+import { isDigit, isEqualsSymbol, isSkippedWhitespace, SPACE } from './symbols';
 
 export type NumberWithUnitTokenizerTerms = {
   Unit: number;
   PercentSuffix: number;
 };
 
-function isDigit(code: number) {
-  return code >= 48 && code <= 57;
-}
-
-function isEqualsSymbol(code: number) {
-  return code === EQUALS || code === COLON;
-}
-
 /** Unit/currency tokens must not continue into an Identifier (e.g. `s` in `sqrt`). */
 function hasUnitSuffixBoundary(input: InputStream, endOffset: number) {
   const next = input.peek(endOffset);
   return next < 0 || !isIdentifierChar(next);
-}
-
-/** Matches Lezer `@whitespace` / grammar `space { @whitespace+ }`. */
-function isSkippedWhitespace(code: number) {
-  return code === 9 || code === 10 || code === 11 || code === 12 || code === 13 || code === 32;
 }
 
 /** Standalone `in` is the convert keyword; inch still matches as a number suffix (`12in`). */

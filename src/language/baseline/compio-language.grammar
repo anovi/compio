@@ -8,6 +8,10 @@
 	PercentSuffix
 }
 
+@external tokens dateTokenizer from "./compio-date-tokens.ts" {
+	HumanDate
+}
+
 @top CalcDoc { pipeline }
 
 pipeline {
@@ -55,6 +59,8 @@ ArgList { expression ("," expression)* }
 
 Literal { NumberWithUnit | PercentLiteral | Number | String | Date }
 
+Date { DateInverted | HumanDate }
+
 NumberWithUnit { Number Unit | Unit Number }
 PercentLiteral { Number PercentSuffix }
 
@@ -63,6 +69,8 @@ ConvertOp { @specialize<Identifier, "IN" | "in" | "into" | "as" | "to"> }
 @precedence {
 	// Results deeper in AST
 	lineEnd,
+	Date,
+	Number,
 	Identifier,
 	FunctionCall,
 	_parenthesized @left, // need to be deepest?
@@ -90,9 +98,11 @@ ConvertOp { @specialize<Identifier, "IN" | "in" | "into" | "as" | "to"> }
 	Integer { @digit+ ((" " | "," | "_") @digit+)* exponentPart? }
 	Number { Integer | Float }
 	String { "\""![\"]*"\"" }
-	Date { (@digit @digit | @digit @digit @digit @digit) "-" @digit @digit "-" @digit @digit }
 
-	@precedence { Date, Number }
+	// Date literals
+	DateInverted { @digit @digit @digit @digit "-" @digit @digit "-" @digit @digit }
+
+	@precedence { DateInverted, Number }
 
 	@precedence { PlusBinaryOp, Number }
 

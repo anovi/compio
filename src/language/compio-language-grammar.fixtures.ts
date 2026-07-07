@@ -633,7 +633,37 @@ expectedTree: `CalcDoc
 },
 // Dates
 {
-name: 'subtraction of dates',
+name: 'date: inverted format',
+doc: '2026-01-20',
+expectedTree: `CalcDoc
+  StatementGroup
+    NoBinding
+      Literal
+        Date
+          DateInverted`,
+},
+{
+name: 'date: human format',
+doc: '10 jan',
+expectedTree: `CalcDoc
+  StatementGroup
+    NoBinding
+      Literal
+        Date
+          HumanDate`,
+},
+{
+name: 'date: human format with month in front',
+doc: 'January 10',
+expectedTree: `CalcDoc
+  StatementGroup
+    NoBinding
+      Literal
+        Date
+          HumanDate`,
+},
+{
+name: 'date: subtraction of dates',
 doc: '2026-01-20 - 2026-01-01',
 expectedTree: `CalcDoc
   StatementGroup
@@ -641,8 +671,10 @@ expectedTree: `CalcDoc
       AddExpression
         Literal
           Date
+            DateInverted
         PlusBinaryOp
         Literal
-          Date`,
+          Date
+            DateInverted`,
 },
 ];

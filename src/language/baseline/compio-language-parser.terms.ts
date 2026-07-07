@@ -27,7 +27,8 @@ export const
   PercentLiteral = 24,
   String = 25,
   Date = 26,
-  Comment = 27,
-  NoBinding = 28,
-  Heading = 29,
-  CommentLine = 30
+  DateInverted = 27,
+  Comment = 28,
+  NoBinding = 29,
+  Heading = 30,
+  CommentLine = 31

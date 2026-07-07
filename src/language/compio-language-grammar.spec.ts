@@ -15,7 +15,7 @@ function assertMatchTree(tree: Tree, expected: string) {
 }
 
 describe('CalcDoc grammar', () => {
-	
+
 	const configuredParser = compioParser.configure({ /* strict: true */ })
 
 	it('should build parser', () => {
