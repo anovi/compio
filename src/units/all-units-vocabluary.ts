@@ -1,4 +1,4 @@
-import { PrefixTree } from "../lib/prefix-tree";
+import { PrefixTree } from "../lib/prefix-tree-metautil.js";
 import { CURRENCY_CODES, CURRENCY_SYMBOLS } from "./currencies-vocabluaries";
 import { CANONICAL_UNIT_SPELLINGS } from "./unit-name-normalizer";
 

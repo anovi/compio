@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { PrefixTree } from "./prefix-tree";
+import { PrefixTree } from "./prefix-tree-metautil.js";
 
 describe("PrefixTree", () => {
 	it("builds from an empty word list", () => {
