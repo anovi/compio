@@ -1,7 +1,9 @@
 import { bench, describe } from 'vitest';
 
-import { BinarySearchArray } from '../lib/binary-search-array';
-import { PrefixTree } from '../lib/prefix-tree';
+import { PrefixTree } from '../lib/prefix-tree.js';
+import { Trie as TrieMetautil } from '../lib/prefix-tree-metautil.js';
+import { BinarySearchArray } from '../lib/binary-search-array.js';
+
 
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
 
@@ -73,26 +75,23 @@ const SEARCH_COUNT = 50_000;
 const words = generateWords(WORD_COUNT, 0xc41c0105);
 const searches = generateSearches(words, SEARCH_COUNT, 0x10010000);
 const trie = PrefixTree.fromWords(words);
+const trieMetautil = new TrieMetautil();
+words.map(w => {
+    trieMetautil.insert(w);
+})
 const sortedArray = BinarySearchArray.fromWords(words);
-
-function arrayHasWord(list: readonly string[], query: string): boolean {
-	const key = query.toLowerCase();
-	for (const w of list) {
-		if (w.toLowerCase() === key) return true;
-	}
-	return false;
-}
 
 describe(`word lookup (${WORD_COUNT} words, ${SEARCH_COUNT} searches)`, () => {
 	bench('PrefixTree.hasWord', () => {
 		for (const q of searches) trie.hasWord(q);
 	});
 
-	bench('array linear scan (case-insensitive)', () => {
-		for (const q of searches) arrayHasWord(words, q);
-	});
-
-	bench('sorted array binary search (case-insensitive)', () => {
+	bench('array binary search', () => {
 		for (const q of searches) sortedArray.hasWord(q);
 	});
+
+	bench('trie Metautil', () => {
+		for (const q of searches) trieMetautil.has(q);
+	});
+
 });
