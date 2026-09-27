@@ -94,10 +94,16 @@ export default {
 		messages: {
 			deepCrossModuleImport:
 				'Import "{{source}}" reaches into "{{target}}" across module boundaries. Import from the public entry "{{entry}}" instead.',
+			crossWorkspaceImport:
+				'Relative import "{{source}}" crosses a workspace boundary. Import the workspace package name instead.',
 		},
 	},
 	create(context) {
-		const srcDir = path.join(context.cwd ?? process.cwd(), 'src');
+		const filename = path.resolve(context.filename);
+		const parts = filename.split(path.sep);
+		const srcIndex = parts.lastIndexOf('src');
+		if (srcIndex === -1) return {};
+		const srcDir = parts.slice(0, srcIndex + 1).join(path.sep) || path.sep;
 		const publicModules = collectPublicModuleDirs(srcDir);
 
 		/** @param {import('estree').ImportDeclaration | import('estree').ExportNamedDeclaration | import('estree').ExportAllDeclaration} node */
@@ -111,11 +117,15 @@ export default {
 			if (!spec.startsWith('.')) return;
 			if (ASSET_IMPORT.test(spec) || VIRTUAL_IMPORT.test(spec)) return;
 
-			const importerPath = path.resolve(context.filename);
+			const importerPath = filename;
 			if (!importerPath.startsWith(srcDir + path.sep)) return;
 
 			const resolved = resolveRelativeImport(importerPath, spec);
 			if (!resolved) return;
+			if (!resolved.startsWith(srcDir + path.sep)) {
+				context.report({ node: source, messageId: 'crossWorkspaceImport', data: { source: spec } });
+				return;
+			}
 
 			const importerModule = topLevelModule(importerPath, srcDir);
 			const targetModule = topLevelModule(resolved, srcDir);

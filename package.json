@@ -1,42 +1,29 @@
 {
   "name": "compio",
+  "version": "0.0.0",
   "private": true,
-  "version": "0.1.0",
   "type": "module",
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
-    "lint": "eslint src",
-    "preview": "npm run build && wrangler dev",
-    "test": "vitest run",
-    "bench": "vitest bench src/benchmarks",
-    "test:watch": "vitest",
-    "test:file:watch": "vitest $npm_config",
-    "grammar": "lezer-generator ./src/language/baseline/compio-language.grammar -o ./src/language/baseline/compio-language-parser.ts && node scripts/patch-lezer-parser.mjs",
+    "dev": "npm run build --workspace=@compio/calculator && npm run build --workspace=@compio/web-ui && npm run build --workspace=@compio/editor && concurrently -n calculator,web-ui,editor,pwa \"npm run dev --workspace=@compio/calculator\" \"npm run dev --workspace=@compio/web-ui\" \"npm run dev --workspace=@compio/editor\" \"npm run dev --workspace=@compio/pwa\"",
+    "build": "npm run build --workspace=@compio/calculator && npm run build --workspace=@compio/web-ui && npm run build --workspace=@compio/editor && npm run build --workspace=@compio/pwa",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "eslint \"apps/*/src/**/*.ts\" \"packages/*/src/**/*.ts\" && npm run boundaries",
+    "boundaries": "node scripts/check-boundaries.mjs",
+    "test": "npm run test --workspaces --if-present",
+    "grammar": "npm run grammar --workspace=@compio/calculator",
     "prepare": "husky",
-    "deploy": "npm run build && wrangler deploy"
+    "preview": "npm run preview --workspace=@compio/pwa",
+    "deploy": "npm run deploy --workspace=@compio/pwa"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.41.0",
     "@types/node": "25.6.2",
     "@typescript-eslint/parser": "^8.46.2",
+    "concurrently": "^9.2.1",
     "eslint": "^9.39.1",
     "husky": "9.1.7",
     "typescript": "~6.0.2",
     "vite": "^8.0.10",
-    "vite-plugin-pwa": "1.3.0",
-    "vitest": "4.1.5",
-    "workbox-window": "7.4.1",
-    "wrangler": "^4.101.0"
-  },
-  "dependencies": {
-    "@codemirror/autocomplete": "^6.20.2",
-    "@lezer/generator": "1.8.0",
-    "codemirror": "6.0.2",
-    "convert": "7.0.0",
-    "convert-units": "3.0.0-beta.8",
-    "decimal.js": "10.6.0",
-    "lezer": "0.13.5"
+    "vitest": "4.1.5"
   }
 }

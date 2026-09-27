@@ -1,0 +1,102 @@
+import Decimal from 'decimal.js';
+import { describe, expect, it } from 'vitest';
+
+import { CalcValue } from '@compio/calculator';
+import { formatCalcSuffix, formatResult, getResultTooltipContent } from './result-format';
+import { getCurrencyDecimalPlaces } from '@compio/calculator';
+
+function calc(result: Decimal, unit?: string, name?: string): CalcValue {
+    return new CalcValue(result, name, undefined, unit);
+}
+
+describe('getCurrencyDecimalPlaces', () => {
+    it('maps numberToBasic to fractional digits', () => {
+        expect(getCurrencyDecimalPlaces('USD')).toBe(2);
+        expect(getCurrencyDecimalPlaces('usd')).toBe(2);
+        expect(getCurrencyDecimalPlaces('BHD')).toBe(3);
+        expect(getCurrencyDecimalPlaces('ZiG')).toBe(undefined);
+    });
+});
+
+describe('formatResult', () => {
+    it('rounds currencies to minor-unit precision', () => {
+        expect(formatResult(calc(new Decimal('92.3456'), 'USD'))).toBe('92.35 USD');
+        expect(formatResult(calc(new Decimal('1.2349'), 'BHD'))).toBe('1.235 BHD');
+    });
+
+    it('rounds physical units by measure kind', () => {
+        expect(formatResult(calc(new Decimal('1.23456789'), 'km'))).toBe('1.2346 km');
+        expect(formatResult(calc(new Decimal('20.456'), 'C'))).toBe('20.46 C');
+        expect(formatResult(calc(new Decimal('1.2345'), 'L'))).toBe('1.235 L');
+    });
+
+    it('uses fewer fractional digits for large magnitudes', () => {
+        expect(formatResult(calc(new Decimal('1234.56789'), 'km'))).toBe('1 234.57 km');
+        expect(formatResult(calc(new Decimal('1234567.89'), 'km'))).toBe('1 234 568 km');
+    });
+
+    it('groups integer digits with spaces', () => {
+        expect(formatResult(calc(new Decimal('1222323.23232')))).toBe('1 222 323.23232');
+    });
+
+    it('uses six fractional digits for unitless values', () => {
+        expect(formatResult(calc(new Decimal('1.23456789')))).toBe('1.234568');
+    });
+
+    it('shows small time conversions without rounding to zero', () => {
+        expect(formatResult(calc(new Decimal('0.0002'), 'min'))).toBe('0.0002 min');
+    });
+
+    it('appends unit when present', () => {
+        expect(formatResult(calc(new Decimal(26), 'USD'))).toBe('26 USD');
+    });
+});
+
+describe('getResultTooltipContent', () => {
+    it('shows binding name on first line when present', () => {
+        expect(getResultTooltipContent(calc(new Decimal('1.23456789'), undefined, 'total'))).toEqual({
+            name: 'total',
+            value: '1.23456789',
+        });
+    });
+
+    it('shows high-precision value without unit', () => {
+        expect(getResultTooltipContent(calc(new Decimal('1.23456789')))).toEqual({
+            value: '1.23456789',
+        });
+    });
+
+    it('adds full unit name', () => {
+        expect(getResultTooltipContent(calc(new Decimal('92.3456'), 'USD'))).toEqual({
+            value: '92.3456',
+            unit: 'United States dollar',
+        });
+        expect(getResultTooltipContent(calc(new Decimal('1.23456789'), 'km'))).toEqual({
+            value: '1.23456789',
+            unit: 'kilometer',
+        });
+    });
+
+    it('groups integer digits with spaces', () => {
+        expect(getResultTooltipContent(calc(new Decimal('1222323.23232')))).toEqual({
+            value: '1 222 323.23232',
+        });
+    });
+
+    it('returns null for errors', () => {
+        const value = new CalcValue(new Decimal(0), undefined, undefined, undefined, 'bad');
+        expect(getResultTooltipContent(value)).toBeNull();
+    });
+});
+
+describe('formatCalcSuffix', () => {
+    it('prefixes formatted value with equals sign', () => {
+        expect(formatCalcSuffix(calc(new Decimal('10.999'), 'EUR'))).toBe('= 11 EUR');
+        expect(formatCalcSuffix(calc(new Decimal('1000000.5')))).toBe('= 1 000 000.5');
+    });
+
+    it('returns error suffix without formatting number', () => {
+        const value = new CalcValue(new Decimal(0), undefined, undefined, undefined, 'bad');
+        expect(formatCalcSuffix(value)).toBe('= Error');
+    });
+});

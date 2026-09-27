@@ -28,6 +28,19 @@ freelance_eur = freelance_usd in EUR
 
 For syntax details and examples, see the [user manual](docs/user-manual.md).
 
+## Development
+
+Compio is an npm workspace monorepo:
+
+- `apps/pwa` owns the shipped application, document workflows, templates, theme persistence, install UI, and PWA configuration.
+- `packages/calculator` owns calculation, language/parser, units, currency metadata, and exchange-rate state.
+- `packages/web-ui` owns generic DOM components, shared icons, and device detection.
+- `packages/editor` owns reusable CodeMirror behavior and editor-only browser utilities.
+
+Install all workspaces with `npm ci`. Run `npm run dev` to watch the three library packages and start the PWA development server. Applications always consume the compiled `@compio/*` package exports from `dist`; source-path aliases and imports into another workspace's `src` directory are intentionally prohibited.
+
+Production builds run in a fixed dependency order: calculator, web UI, editor, then PWA. The root `npm run build`, `npm run typecheck`, `npm run lint`, and `npm test` commands cover every workspace. The generated Lezer parser remains tracked source; regenerate it explicitly with `npm run grammar`.
+
 ## Precision and decimals
 
 Compio computes with full precision behind the scenes. What you see in the **result pill** at the end of each line is a rounded, human-friendly display — not the raw internal value.

@@ -1,0 +1,34 @@
+{
+  "name": "@compio/calculator",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "tsc -p tsconfig.build.json && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "grammar": "lezer-generator ./src/language/baseline/compio-language.grammar -o ./src/language/baseline/compio-language-parser.ts && node ./patch-lezer-parser.mjs"
+  },
+  "dependencies": {
+    "@lezer/common": "^1.5.2",
+    "@lezer/highlight": "^1.2.3",
+    "@lezer/lr": "^1.4.10",
+    "convert": "7.0.0",
+    "convert-units": "3.0.0-beta.8",
+    "decimal.js": "10.6.0"
+  },
+  "peerDependencies": {
+    "@codemirror/language": "^6.12.3",
+    "@codemirror/state": "^6.6.0"
+  },
+  "devDependencies": {
+    "@lezer/generator": "1.8.0"
+  }
+}

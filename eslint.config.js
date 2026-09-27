@@ -3,7 +3,7 @@ import noDeepCrossModuleImports from './eslint-rules/no-deep-cross-module-import
 
 export default [
 	{
-		files: ['src/**/*.ts'],
+		files: ['apps/*/src/**/*.ts', 'packages/*/src/**/*.ts'],
 		ignores: ['**/*.spec.ts'],
 		languageOptions: {
 			parser: tsParser,

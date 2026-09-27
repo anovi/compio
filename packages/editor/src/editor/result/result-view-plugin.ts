@@ -1,0 +1,186 @@
+import type { Range } from '@codemirror/state'
+import {
+  activateHover,
+  closeHoverTooltip,
+  closeHoverTooltips,
+  Decoration,
+  ViewPlugin,
+  WidgetType,
+  type DecorationSet,
+  type EditorView,
+  type ViewUpdate,
+} from '@codemirror/view'
+import { CalcValue } from '@compio/calculator'
+import { isMobileDevice } from '@compio/web-ui'
+import { calcResultHoverTooltip } from './result-tooltip'
+import { copyTextToClipboard } from '../clipboard'
+import { formatResult } from './result-format'
+import { calcRangesField, getCalcRanges, getRatesStore } from '../values-field'
+import { parsePairKey } from '@compio/calculator'
+import { CurrencyRateUpdated } from '../effects'
+
+/**
+ * Inline widget rendering a calculation result next to its source range.
+ *
+ * Equality is based on the displayed value (and binding name, when present),
+ * so the underlying DOM node is reused across transactions whenever the
+ * result is unchanged.
+ */
+class ResultWidget extends WidgetType {
+  readonly value: CalcValue
+
+  constructor(value: CalcValue) {
+    super();
+    this.value = value;
+  }
+
+  eq(other: ResultWidget): boolean {
+    const a = this.value;
+    const b = other.value;
+    if (a.error !== b.error || a.name !== b.name || a.unit !== b.unit) return false;
+    if (a.error != null) return true;
+    return a.result != null && b.result != null && a.result.eq(b.result);
+  }
+
+  toDOM(view: EditorView): HTMLElement {
+    // Two-element layout: the outer span has no visible style and sits flush
+    // against the line's last character so the caret (which CodeMirror draws
+    // at the widget's outer-left edge for `side: 1`) lands on the real text
+    // boundary. The visible pill is an inner element, separated from the text
+    // by transparent padding on the outer.
+    const wrap = document.createElement('span');
+    wrap.className = 'cm-calc-result';
+    wrap.setAttribute('aria-hidden', 'true');
+    wrap.style.userSelect = 'none';
+
+    const pill = document.createElement('span');
+    if (this.value.error != null) {
+      // KEEP IT FOR DEBUGGING
+      pill.className = 'cm-calc-result__pill cm-calc-result__pill--error';
+      pill.textContent = '= Error';
+      pill.title = this.value.error;
+    } else {
+      pill.className = 'cm-calc-result__pill';
+      pill.textContent = `${formatResult(this.value)}`;
+      let open = false;
+      const activate = (e: Event) => {
+        e.preventDefault();
+        if (isMobileDevice()) {
+          if (open) {
+            view.dispatch({
+              effects: closeHoverTooltip(calcResultHoverTooltip)
+            })
+            open = false;
+            return;
+          }
+          const pos = view.posAtDOM(pill);
+          view.dispatch({ effects: closeHoverTooltips });
+          activateHover(view, pos, 1, {
+            tooltip: calcResultHoverTooltip,
+            until: (tr) => tr.selection != null,
+          });
+          open = true;
+          return;
+        }
+        this.#copyResult(() => this.#focusLine(view, pill));
+      };
+      pill.addEventListener('touchend', activate);
+      pill.addEventListener('click', activate);
+    }
+    wrap.appendChild(pill);
+
+    return wrap;
+  }
+
+  
+  ignoreEvent(): boolean {
+    return true;
+  }
+
+  #focusLine(view: EditorView, dom: HTMLSpanElement) {
+    const pos = view.posAtDOM(dom);
+    view.dispatch({
+      selection: { anchor: pos }
+    });
+    if (!view.hasFocus) view.focus();
+  }
+
+  #copyResult(cb?: () => void): void {
+    if (this.value.error != null) return;
+    const res = copyTextToClipboard(formatResult(this.value));
+    if (cb) cb();
+    res.clear();
+  }
+}
+
+/**
+ * Walks the current `calcRangesField` and emits a widget decoration anchored
+ * at the end of the line each value occupies. The grammar's `lineEnd` token
+ * is part of the value's range, so we anchor at `doc.lineAt(from).to` to land
+ * BEFORE the trailing newline (or at EOF for the last row).
+ */
+function buildDecorations(view: EditorView): DecorationSet {
+  const set = getCalcRanges(view.state);
+  if (set.size === 0) return Decoration.none;
+
+  const widgets: Range<Decoration>[] = []
+  const doc = view.state.doc;
+  const cursor = set.iter();
+  while (cursor.value !== null) {
+    const lineEnd = doc.lineAt(cursor.from).to;
+    if (!cursor.value.error && !cursor.value.primitive)
+      widgets.push(
+        Decoration.widget({
+          widget: new ResultWidget(cursor.value),
+          side: 1,
+        }).range(lineEnd),
+      )
+    cursor.next();
+  }
+  return Decoration.set(widgets, true);
+}
+
+/**
+ * View plugin that mirrors `calcRangesField` as a `DecorationSet`.
+ *
+ * Decorations live on the view (not in state) because they're a pure
+ * presentation concern; we just rebuild them whenever the field's reference
+ * changes (i.e., the calculator recomputed). Reference equality on the field's
+ * value avoids unnecessary work when only the selection or viewport moved.
+ */
+export const calcResultsPlugin = ViewPlugin.fromClass(
+  class {
+    decorations: DecorationSet;
+    subscriptions: (() => void)[] = [];
+
+    constructor(view: EditorView) {
+      this.decorations = buildDecorations(view);
+    }
+
+    update(update: ViewUpdate): void {
+      const before = update.startState.field(calcRangesField);
+      const after = update.state.field(calcRangesField);
+      if (this.subscriptions.length > 0) this.subscriptions.forEach(sub => sub());
+      this.subscriptions = after.awaitedRates
+        .map((pairKey) => {
+          return this.subscribeToCurrencyRateUpdate(pairKey, update.view)
+        })
+        .filter((v) => v != null);
+      if (before !== after) {
+        this.decorations = buildDecorations(update.view);
+      }
+    }
+
+    subscribeToCurrencyRateUpdate(pairKey: string, view: EditorView) {
+      const pair = parsePairKey(pairKey);
+      if (!pair) return;
+      return getRatesStore(view.state).subscribe(pair.from, pair.to, (state) => {
+        if (!state.entry) return;
+        view.dispatch({ effects: CurrencyRateUpdated.of(null) })
+      });
+    }
+  },
+  {
+    decorations: (v) => v.decorations,
+  },
+)
