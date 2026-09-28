@@ -1,0 +1,128 @@
+.compio-editor,
+.cm-suggestions-panel--portaled {
+  color-scheme: dark;
+
+  --main-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --editor-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --z-layer-overlay: 900;
+
+  --background: #202020;
+  --text-primary: #ffffff;
+  --text-secondary: #cdcdcd;
+  --icon-color: #79cec9;
+  --accent: #19706a;
+  --accent-text: #50ece0;
+  --on-accent-primary: #ffffff;
+  --on-accent-secondary: #c7e6e4;
+  --border-level-1: rgb(255 255 255 / 6%);
+  --border-level-2: rgb(255 255 255 / 12%);
+  --border-level-3: rgb(255 255 255 / 18%);
+  --transparent-base: 255 255 255;
+  --surface-level-1: #262626;
+  --surface-level-2: #313030;
+  --surface-level-3: #3b3b3b;
+
+  --editor-selection: oklch(from var(--editor-operator) calc(l - 0.36) c h / 0.7);
+  --editor-base: #cdcdcd;
+  --editor-heading: var(--editor-base);
+  --editor-comment: rgb(255 255 255 / 67%);
+  --editor-number: #ffffff;
+  --editor-unit: #ffffff;
+  --editor-result: var(--on-accent-primary);
+  --editor-result-bg: color-mix(in oklch, var(--accent) 95%, transparent);
+  --editor-result-stroke: transparent;
+  --editor-operator: #cda4ff;
+  --editor-variable: var(--editor-base);
+  --editor-label: rgb(91, 215, 192);
+  --editor-parenthesis-lvl1: #c6d6d5;
+  --editor-parenthesis-lvl2: #c6d6d5;
+  --editor-parenthesis-lvl3: #c6d6d5;
+  --editor-function: #f8e2ba;
+
+  --shadow-sm: 0 1px 3px rgb(3 7 18 / 8%), 0 5px 12px rgb(3 7 18 / 5%), 0 12px 27px rgb(3 7 18 / 3%);
+  --shadow-md: 0 1px 1px rgb(3 7 18 / 22%), 0 5px 4px rgb(3 7 18 / 18%), 0 12px 9px rgb(3 7 18 / 13%), 0 20px 15px rgb(3 7 18 / 9%), 0 32px 24px rgb(3 7 18 / 4%);
+  --error: red;
+  --lint-error-wave-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='3'%3E%3Cpath d='m0 2.5 l2 -1.5 l1 0 l2 1.5 l1 0' stroke='%23FF5876' fill='none' stroke-width='1.2'/%3E%3C/svg%3E");
+  --warning: var(--editor-operator);
+  --warning-subtle-bg: color-mix(in oklch, var(--warning) 12%, transparent);
+  --warning-subtle-border: color-mix(in oklch, var(--warning) 35%, transparent);
+
+  --autocomplete-bg: var(--surface-level-1);
+  --autocomplete-selected-bg: rgb(var(--transparent-base) / 8%);
+  --autocomplete-matched-fg: var(--accent-text);
+  --tooltip-bg: var(--surface-level-1);
+  --tooltip-fg: var(--text-primary);
+  --tooltip-border-color: var(--border-level-2);
+  --tooltip-section-border-color: var(--tooltip-border-color);
+  --tooltip-shadow: 0 0 0 1px rgb(255 255 255 / 15%), 0 0 0 2px rgb(0 0 0 / 30%), var(--shadow-sm);
+  --tooltip-arrow-border-color: var(--tooltip-border-color);
+  --tooltip-arrow-fill-color: var(--tooltip-bg);
+  --tooltip-diagnostic-fg: var(--tooltip-fg);
+  --tooltip-diagnostic-error-accent: var(--error);
+  --tooltip-diagnostic-warning-accent: var(--warning);
+  --tooltip-diagnostic-info-accent: var(--text-secondary);
+  --tooltip-diagnostic-hint-accent: var(--accent);
+  --tooltip-diagnostic-source-fg: var(--text-secondary);
+
+  --button-bg: var(--accent);
+  --button-fg: var(--on-accent-primary);
+  --button-hover-bg: color-mix(in oklch, var(--button-bg) 90%, black);
+  --button-hover-fg: var(--on-accent-primary);
+  --button-active-bg: var(--button-hover-bg);
+  --button-active-fg: var(--button-hover-fg);
+  --button-secondary-bg: transparent;
+  --button-secondary-fg: var(--text-primary);
+  --button-secondary-hover-bg: color-mix(in oklch, var(--accent) 90%, black);
+  --button-secondary-hover-fg: var(--text-primary);
+  --button-secondary-active-bg: var(--button-secondary-hover-bg);
+  --button-secondary-active-fg: var(--on-accent-primary);
+  --main-button-bg: color-mix(in oklch, var(--accent) 82%, black);
+  --main-button-hover-bg: color-mix(in oklch, var(--accent) 72%, black);
+  --result-border-color: var(--editor-result-stroke);
+  --result-hover-border-color: transparent;
+}
+
+.compio-editor[data-compio-theme="light"],
+.cm-suggestions-panel--portaled[data-compio-theme="light"] {
+  color-scheme: light;
+
+  --background: #f8f8f6;
+  --text-primary: #4a515b;
+  --text-secondary: #67696d;
+  --icon-color: #19706a;
+  --accent: #19706a;
+  --accent-text: #19706a;
+  --on-accent-primary: #ffffff;
+  --on-accent-secondary: #c7e6e4;
+  --border-level-1: rgb(0 0 0 / 6%);
+  --border-level-2: rgb(0 0 0 / 12%);
+  --border-level-3: rgb(0 0 0 / 18%);
+  --transparent-base: 32 32 0;
+  --surface-level-1: #f3f3f1;
+  --surface-level-2: #efefeb;
+  --surface-level-3: #e6e6e0;
+
+  --editor-selection: color-mix(in oklch, var(--editor-operator) 20%, var(--background));
+  --editor-base: #000000;
+  --editor-heading: var(--editor-base);
+  --editor-comment: #67696d;
+  --editor-number: var(--editor-base);
+  --editor-unit: var(--editor-base);
+  --editor-result: var(--on-accent-primary);
+  --editor-result-bg: color-mix(in oklch, var(--accent) 95%, transparent);
+  --editor-result-stroke: transparent;
+  --editor-operator: #8a2aff;
+  --editor-variable: var(--editor-base);
+  --editor-label: var(--accent);
+  --editor-parenthesis-lvl1: #7e7e7e;
+  --editor-parenthesis-lvl2: #7e7e7e;
+  --editor-parenthesis-lvl3: #7e7e7e;
+  --editor-function: #966305;
+
+  --shadow-sm: 0 1px 3px rgb(3 7 18 / 8%), 0 5px 12px rgb(3 7 18 / 5%), 0 12px 27px rgb(3 7 18 / 3%);
+  --shadow-md: 0 0 1px rgb(3 7 18 / 8%), 0 4px 4px rgb(3 7 18 / 6%), 0 11px 9px rgb(3 7 18 / 5%), 0 18px 15px rgb(3 7 18 / 3%), 0 30px 24px rgb(3 7 18 / 2%);
+  --lint-error-wave-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='3'%3E%3Cpath d='m0 2.5 l2 -1.5 l1 0 l2 1.5 l1 0' stroke='%23ff0000' fill='none' stroke-width='.7'/%3E%3C/svg%3E");
+  --warning: var(--editor-function);
+  --tooltip-bg: var(--surface-level-2);
+  --tooltip-shadow: 0 0 0 1px rgb(255 255 255 / 90%), 0 0 0 2px rgb(0 0 0 / 12%), var(--shadow-md);
+}

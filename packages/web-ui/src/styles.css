@@ -174,7 +174,7 @@ button.primary {
   }
 }
 
-#editor .cm-document-controls__functions-button {
+.compio-editor .cm-document-controls__functions-button {
   font-family: var(--editor-font);
   font-size: 1.35rem;
   font-weight: 500;

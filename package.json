@@ -3,17 +3,22 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "npm run build --workspace=@compio/calculator && npm run build --workspace=@compio/web-ui && npm run build --workspace=@compio/editor && concurrently -n calculator,web-ui,editor,pwa \"npm run dev --workspace=@compio/calculator\" \"npm run dev --workspace=@compio/web-ui\" \"npm run dev --workspace=@compio/editor\" \"npm run dev --workspace=@compio/pwa\"",
-    "build": "npm run build --workspace=@compio/calculator && npm run build --workspace=@compio/web-ui && npm run build --workspace=@compio/editor && npm run build --workspace=@compio/pwa",
+    "build": "npm run build --workspace=@compio/calculator && npm run build --workspace=@compio/web-ui && npm run build --workspace=@compio/editor && npm run build --workspace=@compio/website && npm run build --workspace=@compio/pwa",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint \"apps/*/src/**/*.ts\" \"packages/*/src/**/*.ts\" && npm run boundaries",
     "boundaries": "node scripts/check-boundaries.mjs",
     "test": "npm run test --workspaces --if-present",
     "grammar": "npm run grammar --workspace=@compio/calculator",
     "prepare": "husky",
+    "dev:website": "npm run build --workspace=@compio/calculator && npm run build --workspace=@compio/web-ui && npm run build --workspace=@compio/editor && npm run dev --workspace=@compio/website",
     "preview": "npm run preview --workspace=@compio/pwa",
+    "preview:website": "npm run preview --workspace=@compio/website",
     "deploy": "npm run deploy --workspace=@compio/pwa"
   },
   "devDependencies": {
@@ -22,6 +27,7 @@
     "concurrently": "^9.2.1",
     "eslint": "^9.39.1",
     "husky": "9.1.7",
+    "jsdom": "30.1.1",
     "typescript": "~6.0.2",
     "vite": "^8.0.10",
     "vitest": "4.1.5"

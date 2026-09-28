@@ -1,7 +1,7 @@
 import { type NodeIterator } from '@lezer/common';
 import { syntaxTree } from '@codemirror/language';
 import { StateField } from "@codemirror/state";
-import { showPanel } from "@codemirror/view";
+import { showPanel, type PanelConstructor } from "@codemirror/view";
 
 import { isAtomicSelection } from '../../lib/codemirror';
 import { terms } from '@compio/calculator';
@@ -9,7 +9,6 @@ import { terms } from '@compio/calculator';
 import { ToggleToolbar } from '../effects';
 import { skipWhiteSpaceBackward } from '../editor-commands';
 import { OperationsDictionary, type OperationDef } from './operations-dictionary';
-import { createHelpPanel } from './mobile-toolbar-panel';
 
 
 /*=======================================================
@@ -106,11 +105,15 @@ export const SuggestionsStateField = StateField.define<OperationDef[]>({
 /**
  * Keeps the state of the panel state: if the panel is open.
  */
-export const helpPanelState = StateField.define<boolean>({
-    create: () => false,
-    update(value, tr) {
-        for (let e of tr.effects) if (e.is(ToggleToolbar)) return e.value;
-        return value
-    },
-    provide: f => showPanel.from(f, on => on ? createHelpPanel : null),
-});
+export function createHelpPanelState(createPanel: PanelConstructor) {
+    return StateField.define<boolean>({
+        create: () => false,
+        update(value, tr) {
+            for (const effect of tr.effects) {
+                if (effect.is(ToggleToolbar)) return effect.value;
+            }
+            return value
+        },
+        provide: field => showPanel.from(field, on => on ? createPanel : null),
+    });
+}

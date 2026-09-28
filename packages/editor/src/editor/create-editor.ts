@@ -29,14 +29,20 @@ export type CreateEditorOptions = {
   isDark?: boolean
   extraExtensions?: Extension[]
   ratesStore?: RatesStore
-  onMobileToolbarVisibilityChange?: (visible: boolean) => void
+  placeholder?: string
+  mobileToolbar?: false | {
+    portalContainer?: HTMLElement
+    onVisibilityChange?: (visible: boolean) => void
+  }
 }
 
 export type EditorInstance = {
   view: EditorView
   extensions: Extension[]
+  getDocument: () => string
   setDocument: (content: string) => void
   setColorScheme: (isDark: boolean) => void
+  destroy: () => void
 }
 
 export function createEditor({
@@ -45,9 +51,38 @@ export function createEditor({
   isDark = true,
   extraExtensions = [],
   ratesStore = defaultRatesStore,
-  onMobileToolbarVisibilityChange,
+  placeholder: placeholderText = 'Write a formula or variable',
+  mobileToolbar = {},
 }: CreateEditorOptions): EditorInstance {
   let currentIsDark = isDark
+  let portaledToolbar: HTMLElement | null = null
+  let copiedToolbarProperties: string[] = []
+
+  parent.classList.add('compio-editor')
+  parent.dataset.compioTheme = currentIsDark ? 'dark' : 'light'
+
+  function syncPortaledToolbarTheme(panel: HTMLElement | null) {
+    portaledToolbar = panel
+    if (!panel) {
+      copiedToolbarProperties = []
+      return
+    }
+
+    for (const property of copiedToolbarProperties) panel.style.removeProperty(property)
+    const styles = getComputedStyle(parent)
+    copiedToolbarProperties = Array.from(styles).filter(property => property.startsWith('--'))
+    for (const property of copiedToolbarProperties) {
+      panel.style.setProperty(property, styles.getPropertyValue(property))
+    }
+    panel.dataset.compioTheme = currentIsDark ? 'dark' : 'light'
+  }
+
+  const toolbarExtensions = mobileToolbar === false
+    ? false
+    : {
+        ...mobileToolbar,
+        onPanelElementChange: syncPortaledToolbarTheme,
+      }
 
   const buildExtensions = (dark: boolean): Extension[] => [
     basicSetup(),
@@ -67,8 +102,8 @@ export function createEditor({
     functionArgsTooltip(),
     variableHoverTooltip,
     syntaxHighlighting(compioHighlightStyle),
-    helpPanel(onMobileToolbarVisibilityChange),
-    placeholder('Write a formula or variable'),
+    helpPanel(toolbarExtensions),
+    placeholder(placeholderText),
     createEditorTheme(dark),
     calcSyntaxLinter,
     // safariFocusScrollFix(),
@@ -86,12 +121,22 @@ export function createEditor({
   return {
     view,
     extensions,
+    getDocument() {
+      return view.state.doc.toString()
+    },
     setDocument(content: string) {
       view.setState(EditorState.create({ doc: content, extensions: buildExtensions(currentIsDark) }))
     },
     setColorScheme(nextIsDark: boolean) {
       currentIsDark = nextIsDark
+      parent.dataset.compioTheme = nextIsDark ? 'dark' : 'light'
       reconfigureEditorTheme(view, nextIsDark)
+      syncPortaledToolbarTheme(portaledToolbar)
+    },
+    destroy() {
+      view.destroy()
+      parent.classList.remove('compio-editor')
+      delete parent.dataset.compioTheme
     },
   }
 }

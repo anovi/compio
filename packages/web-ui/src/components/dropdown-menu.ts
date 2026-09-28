@@ -64,8 +64,9 @@ function positionDropdown(
   }
 }
 
-function positionMobileMenu(menu: HTMLElement): void {
-  const topPanel = document.querySelector('#editor .cm-panels-top');
+function positionMobileMenu(menu: HTMLElement, view?: EditorView): void {
+  const editor = view?.dom.closest('.compio-editor');
+  const topPanel = editor?.querySelector('.cm-panels-top');
   menu.style.top = topPanel
     ? `${topPanel.getBoundingClientRect().bottom}px`
     : '';
@@ -189,7 +190,7 @@ export function mountDropdownMenu(
   const open = () => {
     if (isOpen) return;
     options.renderContent(scroll, close);
-    if (mobile) positionMobileMenu(menu);
+    if (mobile) positionMobileMenu(menu, options.view);
     else positionDropdown(menu, trigger, margin);
     menu.hidden = false;
     backdrop.hidden = false;
@@ -220,7 +221,7 @@ export function mountDropdownMenu(
 
   const onLayoutChange = () => {
     if (!isOpen) return;
-    if (mobile) positionMobileMenu(menu);
+    if (mobile) positionMobileMenu(menu, options.view);
     else positionDropdown(menu, trigger, margin);
   };
 

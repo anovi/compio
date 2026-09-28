@@ -10,7 +10,13 @@ import { toggleInlineFormat } from '../editor-commands';
 import { OPERATION_ICON } from './operation-icons';
 import { OperationsDictionary, type Operation, type OperationDef } from './operations-dictionary';
 import { createPanelPositioner, type PanelPositioner } from "./panel-positioner";
-import { helpPanelState } from "./state";
+import { createHelpPanelState } from "./state";
+
+export type MobileToolbarOptions = {
+    portalContainer?: HTMLElement;
+    onVisibilityChange?: (visible: boolean) => void;
+    onPanelElementChange?: (panel: HTMLElement | null) => void;
+};
 
 
 /*===============================================================================
@@ -51,8 +57,7 @@ function dismissKeyboardButton(view: EditorView): HTMLButtonElement {
 
 function suggestionPanel(view: EditorView) {
     const dom = document.createElement("div");
-    dom.className = "cm-help-panel";
-    dom.id = "cm-suggestions-panel";
+    dom.className = "cm-help-panel cm-suggestions-panel";
     dom.setAttribute('aria-hidden', 'true');
 
     const dismissBtn = dismissKeyboardButton(view);
@@ -78,11 +83,22 @@ function suggestionPanel(view: EditorView) {
 /**
  * Creates Codemirror's panel.
  */
-export function createHelpPanel(view: EditorView): Panel {
-    const fakePanel = document.createElement("div");
-    fakePanel.style.height = 48 + 'px';
-
-    const panel = suggestionPanel(view);    
+export function createHelpPanel(
+    view: EditorView,
+    portalContainer?: HTMLElement,
+    onPanelElementChange?: (panel: HTMLElement | null) => void,
+): Panel {
+    const panel = suggestionPanel(view);
+    const spacer = document.createElement("div");
+    spacer.className = 'cm-suggestions-panel-spacer';
+    const portaled = Boolean(portalContainer);
+    if (portaled) {
+        panel.panel.classList.add('cm-suggestions-panel--portaled');
+        panel.panel.setAttribute('aria-hidden', 'true');
+        onPanelElementChange?.(panel.panel);
+    } else {
+        panel.panel.setAttribute('aria-hidden', 'false');
+    }
 
     const buttons: HTMLButtonElement[] = [];
     const dispatch = (operation: OperationDef) => {
@@ -115,12 +131,11 @@ export function createHelpPanel(view: EditorView): Panel {
 
     return {
         top: false,
-        dom: fakePanel,
-        mount: () => {
-            document.body.appendChild(panel.panel);
-        },
+        dom: portaled ? spacer : panel.panel,
+        mount: portaled ? () => portalContainer?.appendChild(panel.panel) : undefined,
         destroy: () => {
             panel.remove();
+            onPanelElementChange?.(null);
         },
         // update: (update) => {
         //     buttons.forEach(btn => btn.remove());
@@ -142,21 +157,21 @@ export function createHelpPanel(view: EditorView): Panel {
 /**
  * Dispatches a ToggleToolbar effect when the editor's focus changes.
  */
-const helpPanelFocusSync = EditorView.updateListener.of((update) => {
-    if (!update.focusChanged) return;
-    const show = update.view.hasFocus;
-    if (update.state.field(helpPanelState) === show) return;
-    update.view.dispatch({ effects: ToggleToolbar.of(show) });
-});
+function helpPanelFocusSync(panelState: ReturnType<typeof createHelpPanelState>) {
+    return EditorView.updateListener.of((update) => {
+        if (!update.focusChanged) return;
+        const show = update.view.hasFocus;
+        if (update.state.field(panelState) === show) return;
+        update.view.dispatch({ effects: ToggleToolbar.of(show) });
+    });
+}
 
 /** Extra space kept between the selection and the fixed suggestions panel. */
 const PANEL_SCROLL_PADDING_PX = 8;
 
-function ensureSelectionAbovePanel(view: EditorView) {
-    if (!view.hasFocus || !view.state.field(helpPanelState)) return;
-
-    const panel = document.getElementById('cm-suggestions-panel');
-    if (!panel?.classList.contains('cm-suggestions-panel--visible')) return;
+function ensureSelectionAbovePanel(view: EditorView, panel: HTMLElement) {
+    if (!view.hasFocus) return;
+    if (!panel.classList.contains('cm-suggestions-panel--visible')) return;
 
     const head = view.state.selection.main.head;
     const coords = view.coordsAtPos(head);
@@ -168,10 +183,10 @@ function ensureSelectionAbovePanel(view: EditorView) {
     view.scrollDOM.scrollTop += coords.bottom - panelTop + PANEL_SCROLL_PADDING_PX;
 }
 
-function scheduleEnsureSelectionAbovePanel(view: EditorView) {
+function scheduleEnsureSelectionAbovePanel(view: EditorView, panel: HTMLElement) {
     requestAnimationFrame(() => {
-        ensureSelectionAbovePanel(view);
-        requestAnimationFrame(() => ensureSelectionAbovePanel(view));
+        ensureSelectionAbovePanel(view, panel);
+        requestAnimationFrame(() => ensureSelectionAbovePanel(view, panel));
     });
 }
 
@@ -179,7 +194,11 @@ function scheduleEnsureSelectionAbovePanel(view: EditorView) {
  * The plugin creates positioner for a panel while panel is active.
  * And destroys positioner when panel hides. It only does syncing.
  */
-function helpPanelViewPlugin(onVisibilityChange?: (visible: boolean) => void) {
+function helpPanelViewPlugin(
+    panelState: ReturnType<typeof createHelpPanelState>,
+    portaledPanel: () => HTMLElement | null,
+    onVisibilityChange?: (visible: boolean) => void,
+) {
 return ViewPlugin.fromClass(class HelpPanelView {
     #positioner: PanelPositioner | null = null;
     #view: EditorView;
@@ -190,13 +209,15 @@ return ViewPlugin.fromClass(class HelpPanelView {
     }
 
     update(update: ViewUpdate) {
-        const wasOpen = update.startState.field(helpPanelState);
-        const isOpen = update.state.field(helpPanelState);
+        const wasOpen = update.startState.field(panelState);
+        const isOpen = update.state.field(panelState);
         if (wasOpen !== isOpen) {
             this.#syncPositioner(isOpen);
-            if (isOpen) scheduleEnsureSelectionAbovePanel(update.view);
+            const panel = portaledPanel();
+            if (isOpen && panel) scheduleEnsureSelectionAbovePanel(update.view, panel);
         } else if (isOpen && (update.selectionSet || update.focusChanged)) {
-            scheduleEnsureSelectionAbovePanel(update.view);
+            const panel = portaledPanel();
+            if (panel) scheduleEnsureSelectionAbovePanel(update.view, panel);
         }
     }
 
@@ -206,13 +227,13 @@ return ViewPlugin.fromClass(class HelpPanelView {
         notifyMobileToolbarVisibility(onVisibilityChange, isOpen);
         if (!isOpen) return;
 
-        const elem = document.getElementById('cm-suggestions-panel') as HTMLDivElement | null;
+        const elem = portaledPanel();
         if (!elem) return;
 
         this.#positioner = createPanelPositioner({
             dock: elem,
             getVisible: () => true,
-            onAfterSync: () => scheduleEnsureSelectionAbovePanel(this.#view),
+            onAfterSync: () => scheduleEnsureSelectionAbovePanel(this.#view, elem),
         });
     }
 
@@ -230,12 +251,25 @@ export function notifyMobileToolbarVisibility(
     listener?.(visible);
 }
 
-export function helpPanel(onVisibilityChange?: (visible: boolean) => void) {
+export function helpPanel(options: false | MobileToolbarOptions = {}) {
+    if (options === false) return [];
     if (!isMobileDevice()) return [];
 
+    let panelElement: HTMLElement | null = null;
+    const panelState = createHelpPanelState(view => {
+        return createHelpPanel(view, options.portalContainer, panel => {
+            panelElement = panel;
+            options.onPanelElementChange?.(panel);
+        });
+    });
+
     return [
-        helpPanelState,
-        helpPanelFocusSync,
-        helpPanelViewPlugin(onVisibilityChange),
+        panelState,
+        helpPanelFocusSync(panelState),
+        helpPanelViewPlugin(
+            panelState,
+            () => panelElement,
+            options.onVisibilityChange,
+        ),
     ]
 }

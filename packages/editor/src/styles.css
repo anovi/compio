@@ -1,8 +1,10 @@
+@import './theme.css';
+
 /*=============================================
 =                  Editor                     =
 =============================================*/
 
-#editor {
+.compio-editor {
   font-family: var(--editor-font);
   font-optical-sizing: auto;
   font-weight: 450;
@@ -10,73 +12,74 @@
 
   flex: 1 1 auto;
   display: flex;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 
-#editor .cm-editor {
+.compio-editor .cm-editor {
   position: relative;
   flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
   background: var(--background);
   color: var(--editor-base);
 }
 
-[data-theme="dark"] #editor .cm-editor {
+.compio-editor[data-compio-theme="dark"] .cm-editor {
   color-scheme: dark;
 }
 
-[data-theme="light"] #editor .cm-editor {
+.compio-editor[data-compio-theme="light"] .cm-editor {
   color-scheme: light;
 }
 
-#editor .cm-editor.cm-focused {
+.compio-editor .cm-editor.cm-focused {
   outline: none;
 }
 
-#editor .cm-scroller {
+.compio-editor .cm-scroller {
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
   padding: 12px;
 }
 
-#editor .cm-gutters {
+.compio-editor .cm-gutters {
   background: var(--background);
   color: var(--text-secondary);
   border-right: none;
 }
 
-#editor .cm-activeLine,
-#editor .cm-activeLineGutter {
+.compio-editor .cm-activeLine,
+.compio-editor .cm-activeLineGutter {
   background: var(--surface-level-1);
 }
 
-#editor .cm-foldGutter {
+.compio-editor .cm-foldGutter {
   width: 1.2em;
   min-width: 1.2em;
 }
 
-#editor .cm-foldGutter span {
+.compio-editor .cm-foldGutter span {
   color: var(--text-secondary);
   font-size: 0.85em;
   line-height: inherit;
 }
 
-#editor .cm-foldGutter span:hover {
+.compio-editor .cm-foldGutter span:hover {
   color: var(--text-primary);
 }
 
-#editor .cm-gutterElement {
+.compio-editor .cm-gutterElement {
   &:hover {
     & .cm-foldGutter__button > svg {
       color: rgb(0 0 0 / 50%);
     }
   }
 }
-#editor .cm-foldGutter__button {
+.compio-editor .cm-foldGutter__button {
   svg {
     width: 16px;
     height: 16px;
@@ -84,14 +87,14 @@
     transform: translate(0, 0.2em);
   }
 }
-#editor .cm-foldGutter__button.is-closed  {
+.compio-editor .cm-foldGutter__button.is-closed  {
   svg {
     transform: translate(0, 0.2em) rotate(-90deg);
     color: var(--accent);
   }
 }
 
-#editor .foldLine__expander {
+.compio-editor .foldLine__expander {
   --size: 6px;
   width: var(--size);
   position: relative;
@@ -110,25 +113,25 @@
   }
 }
 
-#editor .cm-cursor {
+.compio-editor .cm-cursor {
   border-left-color: var(--text-primary);
 }
 
-#editor .cm-content::selection,
-#editor .cm-content ::selection {
+.compio-editor .cm-content::selection,
+.compio-editor .cm-content ::selection {
   background: var(--editor-selection);
 }
 
-#editor .cm-content::-moz-selection,
-#editor .cm-content ::-moz-selection {
+.compio-editor .cm-content::-moz-selection,
+.compio-editor .cm-content ::-moz-selection {
   background: var(--editor-selection);
 }
 
-#editor .cm-content {
+.compio-editor .cm-content {
   padding-bottom: 30vh;
 }
 
-#editor .cm-placeholder {
+.compio-editor .cm-placeholder {
   color: var(--text-secondary);
   /* font-style: italic; */
 }
@@ -142,41 +145,41 @@
  * The wrapper stays display:inline so the outer-left edge is still the gap
  * start — CodeMirror draws the caret at the real end-of-line for side:1.
  */
-#editor .cm-calc-result,
-#editor .cm-calc-result::before,
-#editor .cm-calc-result__pill {
+.compio-editor .cm-calc-result,
+.compio-editor .cm-calc-result::before,
+.compio-editor .cm-calc-result__pill {
   -webkit-user-select: none;
   user-select: none;
 }
 
-#editor .cm-calc-result::selection,
-#editor .cm-calc-result ::selection,
-#editor .cm-calc-result::-moz-selection,
-#editor .cm-calc-result ::-moz-selection {
+.compio-editor .cm-calc-result::selection,
+.compio-editor .cm-calc-result ::selection,
+.compio-editor .cm-calc-result::-moz-selection,
+.compio-editor .cm-calc-result ::-moz-selection {
   background: transparent;
 }
 
 /* Buffers around uneditable inline widgets (CodeMirror-internal). */
-#editor .cm-widgetBuffer {
+.compio-editor .cm-widgetBuffer {
   -webkit-user-select: none;
   user-select: none;
 }
 
-#editor .cm-calc-result {
+.compio-editor .cm-calc-result {
   display: inline;
   /* pointer-events: none; */
 }
 
-#editor .cm-calc-result::before {
+.compio-editor .cm-calc-result::before {
   content: '';
   display: inline-block;
   width: 1ch;
 }
-#editor .expander + .cm-widgetBuffer + .cm-widgetBuffer + .cm-calc-result::before {
+.compio-editor .expander + .cm-widgetBuffer + .cm-widgetBuffer + .cm-calc-result::before {
   width: 0;
 }
 
-#editor .cm-calc-result__pill {
+.compio-editor .cm-calc-result__pill {
   display: inline-block;
   position: relative;
   padding: 0 6px;
@@ -205,7 +208,7 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  #editor .cm-calc-result__pill:not(.cm-calc-result__pill--error):hover {
+  .compio-editor .cm-calc-result__pill:not(.cm-calc-result__pill--error):hover {
     &:after {
       color: var(--editor-result);
       background: oklch(from var(--editor-result-bg) calc(l - 0.02) calc(c + 0.02) calc(h - 23));
@@ -213,13 +216,13 @@
   }
 
   /* :active on touch devices sticks after preventDefault() on touchend (iOS). */
-  #editor .cm-calc-result__pill:not(.cm-calc-result__pill--error):active {
+  .compio-editor .cm-calc-result__pill:not(.cm-calc-result__pill--error):active {
     background: color-mix(in oklch, var(--accent) 24%, transparent);
     border-color: color-mix(in oklch, var(--accent) 55%, transparent);
   }
 }
 
-#editor .cm-calc-result__pill--active {
+.compio-editor .cm-calc-result__pill--active {
   color: var(--on-accent-primary);
 
   &:after {
@@ -229,7 +232,7 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  #editor .cm-calc-result__pill--active:hover {
+  .compio-editor .cm-calc-result__pill--active:hover {
     color: var(--on-accent-primary)!important;
 
     &:after {
@@ -238,7 +241,7 @@
   }
 }
 
-#editor .cm-calc-result__pill--error {
+.compio-editor .cm-calc-result__pill--error {
   color: var(--warning);
   background: var(--warning-subtle-bg);
   border-color: var(--warning-subtle-border);
@@ -246,18 +249,18 @@
 
 /* ----------- Bracket ---------- */
 
-#editor .cm-editor.cm-focused .cm-matchingBracket {
+.compio-editor .cm-editor.cm-focused .cm-matchingBracket {
   background-color: oklch(from var(--accent) calc(l + 0.2) calc(c + 0.1) h / 0.2);
 }
 
-#editor .cm-editor.cm-focused .cm-nonmatchingBracket {
+.compio-editor .cm-editor.cm-focused .cm-nonmatchingBracket {
   background-color: oklch(from var(--error) calc(l + 0.2) calc(c + 0.1) h / 0.2);
 }
 
 
 /* ----------- Tooltip generic ---------- */
 
-#editor .cm-tooltip {
+.compio-editor .cm-tooltip {
   background: var(--tooltip-bg);
   color: var(--text-primary);
   border: none;
@@ -265,23 +268,23 @@
   box-shadow: var(--tooltip-shadow)!important;
 }
 
-#editor .cm-tooltip-section:not(:first-child) {
+.compio-editor .cm-tooltip-section:not(:first-child) {
   border-top: 1px solid var(--tooltip-section-border-color);
 }
 
-#editor .cm-tooltip.cm-tooltip-above .cm-tooltip-arrow::before {
+.compio-editor .cm-tooltip.cm-tooltip-above .cm-tooltip-arrow::before {
   border-top-color: var(--tooltip-arrow-border-color);
 }
 
-#editor .cm-tooltip.cm-tooltip-above .cm-tooltip-arrow::after {
+.compio-editor .cm-tooltip.cm-tooltip-above .cm-tooltip-arrow::after {
   border-top-color: var(--tooltip-arrow-fill-color);
 }
 
-#editor .cm-tooltip.cm-tooltip-below .cm-tooltip-arrow::before {
+.compio-editor .cm-tooltip.cm-tooltip-below .cm-tooltip-arrow::before {
   border-bottom-color: var(--tooltip-arrow-border-color);
 }
 
-#editor .cm-tooltip.cm-tooltip-below .cm-tooltip-arrow::after {
+.compio-editor .cm-tooltip.cm-tooltip-below .cm-tooltip-arrow::after {
   border-bottom-color: var(--tooltip-arrow-fill-color);
 }
 
@@ -291,33 +294,33 @@
 
 /* ----------- Diagnostics tooltip ---------- */
 
-#editor .cm-lintRange-error {
+.compio-editor .cm-lintRange-error {
   color: var(--error);
   background-image: var(--lint-error-wave-svg);
 }
 
-#editor .cm-tooltip-lint {
+.compio-editor .cm-tooltip-lint {
   padding: 0;
   margin: 0;
   list-style: none;
 }
 
-#editor .cm-diagnostic {
+.compio-editor .cm-diagnostic {
   padding: 0.4rem;
   color: var(--text-primary);
 }
 
-#editor .cm-diagnostic-error {
+.compio-editor .cm-diagnostic-error {
   /* border-left: 5px solid var(--tooltip-diagnostic-error-accent); */
   border-left: none;
 }
 
-#editor .cm-diagnostic-warning {
+.compio-editor .cm-diagnostic-warning {
   position: relative;
   border-left: none;
   /* padding-left: 16px; */
 }
-/* #editor .cm-diagnostic-warning::before {
+/* .compio-editor .cm-diagnostic-warning::before {
   content: "";
   position: absolute;
   left: 4px;
@@ -329,19 +332,19 @@
   pointer-events: none;
 } */
 
-#editor .cm-diagnostic-info {
+.compio-editor .cm-diagnostic-info {
   border-left: 5px solid var(--tooltip-diagnostic-info-accent);
 }
 
-#editor .cm-diagnostic-hint {
+.compio-editor .cm-diagnostic-hint {
   border-left: 5px solid var(--tooltip-diagnostic-hint-accent);
 }
 
-#editor .cm-diagnosticText {
+.compio-editor .cm-diagnosticText {
   display: block;
 }
 
-#editor .cm-diagnosticAction {
+.compio-editor .cm-diagnosticAction {
   font: inherit;
   border: none;
   padding: 2px 4px;
@@ -358,19 +361,19 @@
   color: var(--button-fg);
 }
 
-#editor .cm-diagnosticAction:hover {
+.compio-editor .cm-diagnosticAction:hover {
   background: var(--button-hover-bg);
   color: var(--button-hover-fg);
 }
 
-#editor .cm-diagnosticSource {
+.compio-editor .cm-diagnosticSource {
   font-size: 70%;
   color: var(--tooltip-diagnostic-source-fg);
 }
 
 /* ----------- Calc result tooltip ---------- */
 
-#editor .cm-calc-result-tooltip {
+.compio-editor .cm-calc-result-tooltip {
   padding: 0.4rem;
   font-family: inherit;
   line-height: 1.35;
@@ -378,7 +381,7 @@
   font-family: var(--main-font);
 }
 
-#editor .cm-calc-result-tooltip__name {
+.compio-editor .cm-calc-result-tooltip__name {
   margin-bottom: 2px;
   font-size: 0.9em;
   font-weight: 500;
@@ -387,24 +390,24 @@
   font-family: var(--editor-font);
 }
 
-#editor .cm-calc-result-tooltip__value {
+.compio-editor .cm-calc-result-tooltip__value {
   font-variant-numeric: tabular-nums;
 }
 
-#editor .cm-calc-result-tooltip__unit {
+.compio-editor .cm-calc-result-tooltip__unit {
   font-weight: 600;
   margin-top: 2px;
   font-size: 0.9em;
   opacity: 0.85;
 }
 
-#editor .cm-calc-result-tooltip__actions {
+.compio-editor .cm-calc-result-tooltip__actions {
   display: flex;
   gap: 0.25rem;
   padding: 0.15rem 0.4rem 0.35rem;
 }
 
-#editor .cm-calc-result-tooltip__action {
+.compio-editor .cm-calc-result-tooltip__action {
   font: inherit;
   font-size: 0.9em;
   font-weight: 500;
@@ -445,7 +448,7 @@
 
 /* ----------- Function args tooltip ---------- */
 
-#editor .cm-fn-args-tooltip {
+.compio-editor .cm-fn-args-tooltip {
   max-width: 280px;
   font-family: var(--main-font);
   font-size: 0.9em;
@@ -453,11 +456,11 @@
   color: var(--text-primary);
 }
 
-#editor .cm-fn-args-tooltip > .cm-tooltip-section {
+.compio-editor .cm-fn-args-tooltip > .cm-tooltip-section {
   padding: 0.45rem 0.55rem;
 }
 
-#editor .cm-fn-args-tooltip__sig {
+.compio-editor .cm-fn-args-tooltip__sig {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -465,7 +468,7 @@
   font-weight: 500;
 }
 
-#editor .cm-fn-args-tooltip__fn-name {
+.compio-editor .cm-fn-args-tooltip__fn-name {
   font-weight: 600;
   color: var(--editor-function);
 }
@@ -473,43 +476,43 @@
   /* margin-bottom: 0.6rem; */
 }
 
-#editor .cm-fn-args-tooltip__sig-punct {
+.compio-editor .cm-fn-args-tooltip__sig-punct {
   color: var(--text-secondary);
 }
 
-#editor .cm-fn-args-tooltip__sig-arg {
+.compio-editor .cm-fn-args-tooltip__sig-arg {
   border-radius: 3px;
   padding: 0 0.1em;
   color: var(--text-primary);
 }
 
-#editor .cm-fn-args-tooltip__sig-arg--active {
+.compio-editor .cm-fn-args-tooltip__sig-arg--active {
   background: var(--accent);
   color: var(--on-accent-primary);
 }
 
-#editor .cm-fn-args-tooltip__fn-doc {
+.compio-editor .cm-fn-args-tooltip__fn-doc {
   color: var(--text-secondary);
   font-family: var(--main-font);
 }
 
-#editor .cm-fn-args-tooltip__current {
+.compio-editor .cm-fn-args-tooltip__current {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
 }
 
-#editor .cm-fn-args-tooltip__current-name {
+.compio-editor .cm-fn-args-tooltip__current-name {
   font-family: var(--main-font);
   /* font-weight: 600; */
   color: var(--text-primary);
 }
 
-#editor .cm-fn-args-tooltip__current-doc {
+.compio-editor .cm-fn-args-tooltip__current-doc {
   color: var(--text-secondary);
 }
 
-#editor .cm-fn-args-tooltip__list {
+.compio-editor .cm-fn-args-tooltip__list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -518,7 +521,7 @@
   gap: 0.2rem;
 }
 
-#editor .cm-fn-args-tooltip__arg {
+.compio-editor .cm-fn-args-tooltip__arg {
   /* display: flex; */
   flex-wrap: wrap;
   align-items: baseline;
@@ -527,22 +530,22 @@
   border-radius: 4px;
 }
 
-#editor .cm-fn-args-tooltip__arg--active {
+.compio-editor .cm-fn-args-tooltip__arg--active {
   /* background: color-mix(in oklch, var(--accent) 18%, transparent); */
 }
 
-#editor .cm-fn-args-tooltip__arg-name {
+.compio-editor .cm-fn-args-tooltip__arg-name {
   font-family: var(--editor-font);
   font-weight: 500;
   color: var(--text-primary);
 }
 
-#editor .cm-fn-args-tooltip__arg--active .cm-fn-args-tooltip__arg-name {
+.compio-editor .cm-fn-args-tooltip__arg--active .cm-fn-args-tooltip__arg-name {
   font-weight: 600;
   color: var(--accent);
 }
 
-#editor .cm-fn-args-tooltip__arg-doc {
+.compio-editor .cm-fn-args-tooltip__arg-doc {
   color: var(--text-secondary);
 }
 
@@ -552,28 +555,36 @@
 =            Suggestions panel                =
 =============================================*/
 
-#cm-suggestions-panel {
+.compio-editor .cm-suggestions-panel,
+.cm-suggestions-panel--portaled {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.cm-suggestions-panel--portaled {
   position: fixed;
   right: 0;
   z-index: var(--z-layer-overlay);
   max-width: 100vw;
   width: 100vw;
-  display: flex;
-  flex-direction: row;
-  overflow: hidden;
   visibility: hidden;
   pointer-events: none;
-
-  visibility: hidden;
-  pointer-events: auto;
 }
 
-#cm-suggestions-panel.cm-suggestions-panel--visible {
+.cm-suggestions-panel--portaled.cm-suggestions-panel--visible {
   visibility: visible;
   pointer-events: auto;
 }
 
-#cm-suggestions-panel {
+.compio-editor .cm-suggestions-panel-spacer {
+  height: 48px;
+}
+
+.compio-editor .cm-suggestions-panel,
+.cm-suggestions-panel--portaled {
   > button {
     flex-shrink: 0;
   }
@@ -680,10 +691,3 @@
     display: block;
   }
 }
-
-
-:root {
-  --dark-mode-bg: #1f1f1f;
-  --light-mode-bg: #ffffff;
-}
-

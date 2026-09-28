@@ -16,7 +16,10 @@ export async function mountApp(root: HTMLElement): Promise<void> {
     parent: root,
     doc: initialDocument.content,
     isDark: ctx.theme.scheme === 'dark',
-    onMobileToolbarVisibilityChange: syncInstallPromptButtonWithBottomToolbar,
+    mobileToolbar: {
+      portalContainer: document.body,
+      onVisibilityChange: syncInstallPromptButtonWithBottomToolbar,
+    },
     extraExtensions: [
       ...emptyEditorPlaceholder(),
       controlsPanel.extensions,
