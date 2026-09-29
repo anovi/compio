@@ -1,7 +1,7 @@
 import { initializeRatesStore } from '@compio/calculator'
 import { createEditor } from '@compio/editor'
 import '@compio/editor/styles.css'
-import './styles.css'
+import './website-styles.css'
 
 const arithmeticRoot = document.querySelector('#arithmetic-editor')
 const currencyRoot = document.querySelector('#currency-editor')
