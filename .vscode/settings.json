@@ -1,0 +1,13 @@
+{
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "js/ts.tsserver.experimental.enableProjectDiagnostics": true,
+  "files.exclude": {
+    "**/dist": true,
+    "**/dist/**": true
+  },
+  "search.exclude": {
+    "**/dist": true,
+    "**/dist/**": true
+  }
+}
