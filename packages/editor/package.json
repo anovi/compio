@@ -17,6 +17,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@compio/brand": "*",
     "@compio/calculator": "*",
     "@compio/web-ui": "*",
     "decimal.js": "10.6.0"

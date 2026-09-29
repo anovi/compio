@@ -1,3 +1,5 @@
+@import '@compio/brand/theme.css';
+
 html,
 body {
   margin: 0;
@@ -159,7 +161,7 @@ body {
   transition: transform 180ms ease-out;
   transition-duration: 100ms;
   background: var(--background);
-  border-right: 1px solid var(--border-level-1);
+  border-right: 1px solid var(--border-1);
   display: flex;
   flex-direction: column;
   padding-top: 64px;
@@ -199,14 +201,14 @@ body {
 
 .documents-list__item {
   &:first-of-type .documents-list__button {
-    border-top: 1px solid var(--border-level-1);  
+    border-top: 1px solid var(--border-1);  
   }
 }
 
 .documents-list__button {
   width: 100%;
   border: none;
-  border-bottom: 1px solid var(--border-level-1);
+  border-bottom: 1px solid var(--border-1);
   background: var(--background);
   color: var(--text-primary);
   padding: 10px 12px;
@@ -268,7 +270,7 @@ body {
 
 .pwa-editor .cm-panels-top {
   border: 0;
-  border-bottom: 1px solid var(--border-level-1);
+  border-bottom: 1px solid var(--border-1);
   background: var(--background);
   z-index: var(--z-layer-drawer);
 }
@@ -325,7 +327,7 @@ body {
 
 .pwa-editor .cm-document-controls__button:is(:hover, :focus-visible) {
   color: var(--text-primary);
-  background: var(--surface-level-2);
+  background: var(--surface-2);
 }
 
 .pwa-editor .cm-document-controls__button:disabled {
@@ -360,7 +362,7 @@ body {
   pointer-events: auto;
   margin: 0;
   padding: 0.4em 1em;
-  border: 1px solid var(--border-level-2);
+  border: 1px solid var(--border-2);
   border-radius: 2em;
   background: none;
   color: var(--text-secondary);
@@ -373,8 +375,8 @@ body {
 
 .pwa-editor .cm-empty-editor-overlay__template-btn:is(:hover, :focus-visible) {
   /* color: var(--accent); */
-  background: var(--surface-level-1);
-  border: 1px solid var(--border-level-3);
+  background: var(--surface-1);
+  border: 1px solid var(--border-3);
   outline: none;
 }
 
@@ -405,7 +407,7 @@ body {
 }
 
 .dropdown-menu--templates .dropdown-menu__close:is(:hover, :focus-visible, :active) {
-  background: var(--surface-level-1);
+  background: var(--surface-1);
   color: var(--text-primary);
   outline: none;
 }
@@ -431,8 +433,8 @@ body {
 =============================================*/
 
 :root {
-  --main-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  --editor-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --main-font: var(--brand-font-sans);
+  --editor-font: var(--brand-font-mono);
 
   font-size: 16px;
   line-height: 1.5;
@@ -459,9 +461,9 @@ body {
   --button-secondary-active-fg: var(--on-accent-primary);
   
   /* Same as in editor styles */
-  --tooltip-bg: var(--surface-level-1);
+  --tooltip-bg: var(--surface-1);
   --tooltip-fg: var(--text-primary);
-  --tooltip-border-color: var(--border-level-2);
+  --tooltip-border-color: var(--border-2);
   --tooltip-section-border-color: var(--tooltip-border-color);
   --tooltip-shadow: 0 0 0 1px rgb(255 255 255 / 15%), 0 0 0 2px rgb(0 0 0 / 30%), var(--shadow-sm);
 }
@@ -479,19 +481,19 @@ body {
   --side-padding: 18px;
 
   /* Base */
-  --background: #202020;
+  --background: var(--brand-color-background);
 
-  --text-primary: #ffffff;
-  --text-secondary: #cdcdcd;
+  --text-primary: var(--brand-color-text-primary);
+  --text-secondary: var(--brand-color-text-secondary);
 
-  --icon-color: #79cec9;
+  --icon-color: var(--brand-color-icon);
 
   /* Accent */
-  --accent: #19706a;
-  --accent-text: #50ece0;
+  --accent: var(--brand-color-accent);
+  --accent-text: var(--brand-color-accent-text);
 
-  --on-accent-primary: #ffffff;
-  --on-accent-secondary: #c7e6e4;
+  --on-accent-primary: var(--brand-color-on-accent-primary);
+  --on-accent-secondary: var(--brand-color-on-accent-secondary);
 
   --accent-b: #674617;
 
@@ -499,34 +501,21 @@ body {
   --on-accent-b-secondary: #ffd394;
 
   /* Borders */
-  --border-level-1: rgb(255 255 255 / 6%);
-  --border-level-2: rgb(255 255 255 / 12%);
-  --border-level-3: rgb(255 255 255 / 18%);
+  --border-1: var(--brand-color-border-1);
+  --border-2: var(--brand-color-border-2);
+  --border-3: var(--brand-color-border-3);
 
   /* Overlays (space-separated channels for rgb(var(--transparent-base) / α)) */
-  --transparent-base: 255 255 255;
+  --transparent-base: var(--brand-color-transparent-base);
 
   /* Surfaces */
-  --surface-level-1: #262626;
-  --surface-level-2: #313030;
-  --surface-level-3: #3b3b3b;
+  --surface-1: var(--brand-color-surface-1);
+  --surface-2: var(--brand-color-surface-2);
+  --surface-3: var(--brand-color-surface-3);
 
-  --shadow-sm:
-    0px 1px 3px rgba(3, 7, 18, 0.08),
-    0px 5px 12px rgba(3, 7, 18, 0.05),
-    0px 12px 27px rgba(3, 7, 18, 0.03);
-  --shadow-md:
-    0px 1px 1px rgba(3, 7, 18, 0.22),
-    0px 5px 4px rgba(3, 7, 18, 0.18),
-    0px 12px 9px rgba(3, 7, 18, 0.13),
-    0px 20px 15px rgba(3, 7, 18, 0.09),
-    0px 32px 24px rgba(3, 7, 18, 0.04);
-  --shadow-lg:
-    0px 0px 1px rgba(3, 7, 18, 0.02),
-    0px 2px 4px rgba(3, 7, 18, 0.03),
-    0px 4px 10px rgba(3, 7, 18, 0.05),
-    0px 8px 17px rgba(3, 7, 18, 0.06),
-    0px 12px 27px rgba(3, 7, 18, 0.08);
+  --shadow-sm: var(--brand-shadow-sm);
+  --shadow-md: var(--brand-shadow-md);
+  --shadow-lg: var(--brand-shadow-lg);
 
   --button-bg: var(--accent);
   --button-fg: var(--on-accent-primary);
@@ -544,52 +533,39 @@ body {
 [data-theme="light"] {
   color-scheme: light;
 
-  --background: #f8f8f6;
+  --background: var(--brand-color-background);
 
-  --text-primary: #4a515b;
-  --text-secondary: #67696d;
+  --text-primary: var(--brand-color-text-primary);
+  --text-secondary: var(--brand-color-text-secondary);
 
-  --icon-color: #19706a;
+  --icon-color: var(--brand-color-icon);
 
-  --accent: #19706a;
-  --accent-text: #19706a;
+  --accent: var(--brand-color-accent);
+  --accent-text: var(--brand-color-accent-text);
 
-  --on-accent-primary: #ffffff;
-  --on-accent-secondary: #c7e6e4;
+  --on-accent-primary: var(--brand-color-on-accent-primary);
+  --on-accent-secondary: var(--brand-color-on-accent-secondary);
 
   --accent-b: #edfaf8;
 
   --on-accent-b-primary: #024b44;
   --on-accent-b-secondary: #4192a6;
 
-  --border-level-1: rgb(0 0 0 / 6%);
-  --border-level-2: rgb(0 0 0 / 12%);
-  --border-level-3: rgb(0 0 0 / 18%);
+  --border-1: var(--brand-color-border-1);
+  --border-2: var(--brand-color-border-2);
+  --border-3: var(--brand-color-border-3);
 
-  --transparent-base: 32 32 0;
+  --transparent-base: var(--brand-color-transparent-base);
 
-  --surface-level-1: #f3f3f1;
-  --surface-level-2: #efefeb;
-  --surface-level-3: #e6e6e0;
+  --surface-1: var(--brand-color-surface-1);
+  --surface-2: var(--brand-color-surface-2);
+  --surface-3: var(--brand-color-surface-3);
 
-  --shadow-sm:
-    0px 1px 3px rgba(3, 7, 18, 0.08),
-    0px 5px 12px rgba(3, 7, 18, 0.05),
-    0px 12px 27px rgba(3, 7, 18, 0.03);
-  --shadow-md:
-    0px 0px 1px rgba(3, 7, 18, 0.08),
-    0px 4px 4px rgba(3, 7, 18, 0.06),
-    0px 11px 9px rgba(3, 7, 18, 0.05),
-    0px 18px 15px rgba(3, 7, 18, 0.03),
-    0px 30px 24px rgba(3, 7, 18, 0.02);
-  --shadow-lg:
-    0px 0px 1px rgba(3, 7, 18, 0.02),
-    0px 2px 4px rgba(3, 7, 18, 0.03),
-    0px 4px 10px rgba(3, 7, 18, 0.05),
-    0px 8px 17px rgba(3, 7, 18, 0.06),
-    0px 12px 27px rgba(3, 7, 18, 0.08);
+  --shadow-sm: var(--brand-shadow-sm);
+  --shadow-md: var(--brand-shadow-md);
+  --shadow-lg: var(--brand-shadow-lg);
   
   /* Same as in editor styles */
-  --tooltip-bg: var(--surface-level-2);
+  --tooltip-bg: var(--surface-2);
   --tooltip-shadow: 0 0 0 1px rgb(255 255 255 / 90%), 0 0 0 2px rgb(0 0 0 / 12%), var(--shadow-md);
 }

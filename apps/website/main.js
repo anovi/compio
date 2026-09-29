@@ -12,6 +12,7 @@ if (!(arithmeticRoot instanceof HTMLElement) || !(currencyRoot instanceof HTMLEl
 
 const colorScheme = window.matchMedia('(prefers-color-scheme: dark)')
 const isDark = colorScheme.matches
+document.documentElement.dataset.theme = isDark ? 'dark' : 'light'
 
 const editors = [
   createEditor({
@@ -38,6 +39,7 @@ left in USD`,
 void initializeRatesStore()
 
 function syncColorScheme(event) {
+  document.documentElement.dataset.theme = event.matches ? 'dark' : 'light'
   for (const editor of editors) editor.setColorScheme(event.matches)
 }
 

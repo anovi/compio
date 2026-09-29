@@ -77,7 +77,7 @@ const staticEditorTheme: Extension[] = [
     autocompleteTheme,
 ]
 
-/** Editor chrome aligned with CSS variables in styles.css. */
+/** Editor chrome aligned with CSS variables in editor-styles.css. */
 export function createEditorTheme(isDark: boolean): Extension[] {
     return [
         editorThemeCompartment.of(EditorView.darkTheme.of(isDark)),

@@ -1,3 +1,4 @@
+@import '@compio/brand/theme.css';
 @import './theme.css';
 
 /*=============================================
@@ -58,7 +59,7 @@
 
 .compio-editor .cm-activeLine,
 .compio-editor .cm-activeLineGutter {
-  background: var(--surface-level-1);
+  background: var(--surface-1);
 }
 
 .compio-editor .cm-foldGutter {

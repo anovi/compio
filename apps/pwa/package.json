@@ -12,6 +12,7 @@
     "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
+    "@compio/brand": "*",
     "@compio/calculator": "*",
     "@compio/editor": "*",
     "@compio/web-ui": "*",
