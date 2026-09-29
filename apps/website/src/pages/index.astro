@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+---
+
+<BaseLayout
+  title="Compio embedded editor examples"
+  description="Try Compio calculations directly in the browser."
+>
+  <main>
+    <header class="intro">
+      <p class="eyebrow">Compio</p>
+      <h1>Write calculations like notes</h1>
+      <p>Edit either example to see arithmetic, units, variables, and currency conversions update immediately.</p>
+    </header>
+
+    <section class="examples" aria-label="Interactive calculator examples">
+      <article class="example">
+        <div class="example__copy">
+          <h2>Everyday arithmetic</h2>
+          <p>Mix regular calculations with compatible units.</p>
+        </div>
+        <div id="arithmetic-editor" class="editor-frame" aria-label="Arithmetic and units editor"></div>
+      </article>
+
+      <article class="example">
+        <div class="example__copy">
+          <h2>Variables and currencies</h2>
+          <p>Name values once, reuse them, and convert the result.</p>
+        </div>
+        <div id="currency-editor" class="editor-frame" aria-label="Variables and currencies editor"></div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    import { initializeRatesStore } from '@compio/calculator'
+    import { createEditor } from '@compio/editor'
+
+    const arithmeticRoot = document.querySelector('#arithmetic-editor')
+    const currencyRoot = document.querySelector('#currency-editor')
+
+    if (!(arithmeticRoot instanceof HTMLElement) || !(currencyRoot instanceof HTMLElement)) {
+      throw new Error('Embedded editor containers are missing')
+    }
+
+    const colorScheme = window.matchMedia('(prefers-color-scheme: dark)')
+    const isDark = colorScheme.matches
+    const editors = [
+      createEditor({
+        parent: arithmeticRoot,
+        isDark,
+        doc: `groceries = 48.50
+coffee = 4.25
+groceries + coffee
+
+distance = 10 km
+distance in mi`,
+      }),
+      createEditor({
+        parent: currencyRoot,
+        isDark,
+        doc: `monthly = 4_200 EUR
+rent = 1_450 EUR
+utilities = 185 EUR
+left = monthly - rent - utilities
+left in USD`,
+      }),
+    ]
+
+    void initializeRatesStore()
+
+    function syncColorScheme(event: MediaQueryListEvent) {
+      document.documentElement.dataset.theme = event.matches ? 'dark' : 'light'
+      for (const editor of editors) editor.setColorScheme(event.matches)
+    }
+
+    colorScheme.addEventListener('change', syncColorScheme)
+
+    window.addEventListener('pagehide', () => {
+      colorScheme.removeEventListener('change', syncColorScheme)
+      for (const editor of editors) editor.destroy()
+    }, { once: true })
+  </script>
+</BaseLayout>
