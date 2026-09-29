@@ -16,6 +16,7 @@
   height: 100%;
   min-width: 0;
   min-height: 0;
+  line-height: 1.5;
 }
 
 .compio-editor .cm-editor {
@@ -125,10 +126,6 @@
 .compio-editor .cm-content::-moz-selection,
 .compio-editor .cm-content ::-moz-selection {
   background: var(--editor-selection);
-}
-
-.compio-editor .cm-content {
-  padding-bottom: 30vh;
 }
 
 .compio-editor .cm-placeholder {

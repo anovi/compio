@@ -21,10 +21,20 @@ body {
   display: flex;
 }
 
+.pwa-editor .cm-content {
+  padding-bottom: 30vh;
+}
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+#app-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 /*=============================================
@@ -447,6 +457,13 @@ body {
   --button-secondary-hover-fg: var(--text-primary);
   --button-secondary-active-bg: color-mix(in oklch, var(--accent) 90%, black);
   --button-secondary-active-fg: var(--on-accent-primary);
+  
+  /* Same as in editor styles */
+  --tooltip-bg: var(--surface-level-1);
+  --tooltip-fg: var(--text-primary);
+  --tooltip-border-color: var(--border-level-2);
+  --tooltip-section-border-color: var(--tooltip-border-color);
+  --tooltip-shadow: 0 0 0 1px rgb(255 255 255 / 15%), 0 0 0 2px rgb(0 0 0 / 30%), var(--shadow-sm);
 }
 
 /* =========================================
@@ -571,5 +588,8 @@ body {
     0px 4px 10px rgba(3, 7, 18, 0.05),
     0px 8px 17px rgba(3, 7, 18, 0.06),
     0px 12px 27px rgba(3, 7, 18, 0.08);
-
+  
+  /* Same as in editor styles */
+  --tooltip-bg: var(--surface-level-2);
+  --tooltip-shadow: 0 0 0 1px rgb(255 255 255 / 90%), 0 0 0 2px rgb(0 0 0 / 12%), var(--shadow-md);
 }

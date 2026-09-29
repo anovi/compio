@@ -1,9 +1,3 @@
-#app-shell {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
 .button-icon {
   display: flex;
   align-items: center;
@@ -18,8 +12,6 @@
   height: 100%;
   display: block;
 }
-
-#app-shell .button-icon {}
 
 button.primary {
   flex: 0 0 48px;
@@ -172,13 +164,6 @@ button.primary {
     opacity: 0;
     transform: translateY(-8px);
   }
-}
-
-.compio-editor .cm-document-controls__functions-button {
-  font-family: var(--editor-font);
-  font-size: 1.35rem;
-  font-weight: 500;
-  line-height: 1;
 }
 
 .dropdown-menu-backdrop {
