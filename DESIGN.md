@@ -11,16 +11,22 @@ Compio should feel like a calm, capable notebook: direct, lightweight, and focus
 
 ## Visual system
 
+### Typography
+
 Use the system sans-serif stack for interface and marketing copy, and the system monospace stack for calculations, code, and live editor content. Body text is `16px` with `1.5` line height. Use weight and scale sparingly; headings are compact, confident, and free of ornamental styling.
 
-The core palette comes from the PWA:
+### Colors
+
+The canonical palette and semantic color tokens live in the shared [brand theme](packages/brand/theme.css). Consume these `--brand-color-*` custom properties instead of copying their raw values or introducing page-specific colors.
+
+The palette is neutral and restrained, with teal reserved for interactive and meaningful emphasis:
 
 - Light background `#f8f8f6`; primary text `#4a515b`; secondary text `#67696d`.
 - Dark background `#202020`; primary text `#ffffff`; secondary text `#cdcdcd`.
 - Brand and action accent `#19706a`; bright dark-theme accent text/icon `#50ece0` or `#79cec9`.
-- Build secondary surfaces and borders from the active background: surfaces progress subtly, while borders use roughly 6%, 12%, and 18% contrast.
+- Each theme provides three progressively stronger surface tokens and three border tokens at roughly 6%, 12%, and 18% contrast. Choose the lowest level that communicates the necessary separation.
 
-Support light and dark themes equally. Use semantic tokens such as `background`, `surface`, `text-primary`, `text-secondary`, `accent`, and `on-accent` rather than page-specific colors. Teal is for actions, selections, links, and meaningful emphasis—not large decorative areas. Syntax colors belong to calculations and should not spread into general UI.
+Support light and dark themes equally. Use tokens by role: background and surface tokens establish hierarchy; primary and secondary text tokens establish emphasis; border tokens separate regions; accent and on-accent tokens communicate interaction. Teal is for actions, selections, links, and meaningful emphasis—not large decorative areas. Syntax colors belong to calculations and should not spread into general UI.
 
 ## Layout and components
 
