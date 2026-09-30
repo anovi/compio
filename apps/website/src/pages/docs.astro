@@ -1,0 +1,67 @@
+---
+import { Content as UserManual } from '../../../../docs/user-manual.md'
+import BaseLayout from '../layouts/BaseLayout.astro'
+---
+
+<BaseLayout
+  title="Compio user manual"
+  description="Learn how to use Compio with interactive examples for calculations, variables, functions, and units."
+>
+  <header class="docs-header">
+    <a class="docs-header__brand" href="/">Compio</a>
+    <a class="docs-header__app" href="/">Examples</a>
+  </header>
+
+  <main class="docs-shell">
+    <article class="docs-content">
+      <UserManual />
+    </article>
+  </main>
+
+  <script>
+    import { showPanel } from '@codemirror/view'
+    import { initializeRatesStore } from '@compio/calculator'
+    import { createEditor, type EditorInstance } from '@compio/editor'
+    import { createHelpPanel } from '../editor-extensions/demo-editor-panel'
+
+    const colorScheme = window.matchMedia('(prefers-color-scheme: dark)')
+    const editors: EditorInstance[] = []
+    const codeBlocks = document.querySelectorAll('.docs-content pre:has(> code.language-text)')
+
+    for (const codeBlock of codeBlocks) {
+      const code = codeBlock.querySelector(':scope > code.language-text')
+      if (!(codeBlock instanceof HTMLElement) || !(code instanceof HTMLElement)) continue
+      const initialSrc = code.textContent.replace(/\n$/, '');
+
+      const editorRoot = document.createElement('div')
+      editorRoot.className = 'docs-editor'
+      // editorRoot.style.setProperty('--docs-editor-height', `${codeBlock.getBoundingClientRect().height}px`)
+      editorRoot.setAttribute('aria-label', 'Interactive Compio example')
+      codeBlock.replaceWith(editorRoot)
+
+      editors.push(createEditor({
+        parent: editorRoot,
+        doc: initialSrc,
+        isDark: colorScheme.matches,
+        mobileToolbar: false,
+        extraExtensions: [
+          showPanel.of((view) => createHelpPanel(view, initialSrc))
+        ]
+      }))
+    }
+
+    if (editors.length > 0) void initializeRatesStore()
+
+    function syncColorScheme(event: MediaQueryListEvent) {
+      document.documentElement.dataset.theme = event.matches ? 'dark' : 'light'
+      for (const editor of editors) editor.setColorScheme(event.matches)
+    }
+
+    colorScheme.addEventListener('change', syncColorScheme)
+
+    window.addEventListener('pagehide', () => {
+      colorScheme.removeEventListener('change', syncColorScheme)
+      for (const editor of editors) editor.destroy()
+    }, { once: true })
+  </script>
+</BaseLayout>

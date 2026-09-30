@@ -49,44 +49,44 @@ Copy the block below into the editor as-is:
 width = 12
 
 // One-off calculation — no variable
-2 + 2 = 4
+2 + 2        → 4
 
 // Comment lines and headings are ignored by the calculator
 # Example header
 
 // Precedence: ^ before * / %, then + -
-2 + 2 * 3 = 8
-2 * 2 ^ 3 = 16
-2 ^ 3 ^ 2 = 512
+2 + 2 * 3    → 8
+2 * 2 ^ 3    → 16
+2 ^ 3 ^ 2    → 512
 
 // Grouping — parentheses override precedence
-(2 + 2) * 3 = 12
-(3 + 2) * 10 = 50
+(2 + 2) * 3  → 12
+(3 + 2) * 10 → 50
 
 // Unary minus binds after exponentiation
-- 4 ^ 2 = -16
-(- 4) ^ 2 = 16
+- 4 ^ 2      → -16
+(- 4) ^ 2    → 16
 
 // Scientific notation
-6.02214076e23 = 6.02214076e+23
-1.5e3 km // 1500 km = 1 500 km
+6.02214076e23       → 6.02214076e+23
+1.5e3 km // 1500 km → 1 500 km
 
 // Functions (see Functions menu for the full list)
-sqrt(16) = 4
-round(3.7) = 4
-num(12 EUR) = 12
+sqrt(16)          → 4
+round(3.7)        → 4
+num(12 EUR)       → 12
 
 // Aggregation — sum lines above within a group
 rent = 100
 food = 50
-sum() = 150
+sum()             → 150
 
 // Units — attach to numbers, mix compatible ones, convert with in / to / as
-100 USD = 100 USD
-10 cm + 1 m = 1.1 m
-//will convert to euros
-10 USD in EUR
-100 cm in m in km = 0.001 km
+100 USD
+10 cm + 1 m       → 1.1 m
+// will convert to euros
+10 USD in EUR     → 8.81 EUR
+100 cm in m in km → 0.001 km
 ```
 
 ---
@@ -159,14 +159,14 @@ Assign a name with `=` or `:`:
 ```text
 tax_rate = 0.21
 net: 100
-gross = net + net * tax_rate
+gross = net + net * tax_rate → 121
 ```
 
 **Naming rules:** names start with a letter (including non-Latin letters) and may contain letters, digits, underscores, dots, and spaces. Spaces join words into a single name — `monthly net` is one variable, not two:
 
 ```text
 pi_approx = 3.141592653589793
-debt_per_capita = total / population
+debt_per_capita = 1_000_000 / 250 → 4_000
 monthly net = 4_200 EUR
 π = 3.141592653589793
 ```
@@ -182,8 +182,8 @@ sqrt(x)
 Variables can carry units:
 
 ```text
-width = 12 EUR
-trip = width * 14
+trip_distance = 12 km
+weekly_distance = trip_distance * 5 → 60 km
 ```
 
 ---
@@ -220,8 +220,8 @@ From highest to lowest precedence:
 Unary minus has lower precedence than exponentiation:
 
 ```text
--4^2     → -16    (negates 4²)
-(-4)^2   → 16     (squares -4)
+-4^2 // negates 4²   → -16
+(-4)^2 // squares -4 → 16
 ```
 
 ### Powers and roots
@@ -268,10 +268,10 @@ pow(2, 10)            → 1024
 The *n*-th root of *x*. The degree *n* is the second argument. Unlike `^`, `root` handles odd integer roots of negative bases correctly.
 
 ```text
-root(16, 2)     → 4      (square root)
-root(27, 3)     → 3      (cube root)
-root(-8, 3)     → -2     (odd root of negative base)
-root(-4, 2)     → NaN    (even root of negative base)
+root(16, 2) // square root                → 4
+root(27, 3) // cube root                  → 3
+root(-8, 3) // odd root of negative base  → -2
+root(-4, 2) // even root of negative base → NaN
 ```
 
 For other roots and powers, see **More roots** and **Exponents & logs** in the Functions menu (`cbrt`, `exp`, `ln`, `log`, and more).
@@ -295,16 +295,16 @@ sqrt(x)    → 3 mm
 rent = 1_450 EUR
 utilities = 185 EUR
 groceries = 520 EUR
-sum()   → 2155 EUR
+sum() → 2155 EUR
 
 10
 20
-sum()   → 30
+sum() → 30
 
 10
 
-20
-sum()   → 20   (only lines after the blank line)
+20 // blank line breaks a group
+sum() → 20
 ```
 
 Aliases: `total()` is the same as `sum()`.
@@ -328,7 +328,7 @@ All aggregated lines must use compatible units (or plain numbers). `sum()` on th
 Attach a unit directly to a number, or separate them with a space:
 
 ```text
-100USD
+100 USD
 100 usd
 12 EUR
 3.5 km
@@ -406,8 +406,9 @@ Multiplication and division work on the numeric parts; incompatible unit combina
 Some spellings match more than one unit. For example, `MS` can mean megaseconds (`Ms`) or milliseconds (`ms`). Compio reports an ambiguity error and suggests the possible units — pick the exact spelling you mean:
 
 ```text
-100 Ms     → megaseconds
-100 ms     → milliseconds
+100 MS
+100 Ms // megaseconds
+100 ms // milliseconds
 ```
 
 ---
@@ -420,6 +421,7 @@ Some spellings match more than one unit. For example, `MS` can mean megaseconds 
 // Monthly budget
 rent = 1450 EUR
 // utilities = 200 EUR
+sum() → 1 450 EUR
 ```
 
 **Headings** start with `#` and are also non-calculating markers for structure:
