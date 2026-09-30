@@ -59,9 +59,14 @@ import BaseLayout from '../layouts/BaseLayout.astro'
 
     colorScheme.addEventListener('change', syncColorScheme)
 
-    window.addEventListener('pagehide', () => {
+    window.addEventListener('pagehide', (event) => {
+      // A persisted page will be restored from the back/forward cache without
+      // rerunning this script. Keep its editors alive so the restored DOM is
+      // still interactive instead of containing destroyed editor roots.
+      if (event.persisted) return
+
       colorScheme.removeEventListener('change', syncColorScheme)
       for (const editor of editors) editor.destroy()
-    }, { once: true })
+    })
   </script>
 </BaseLayout>
