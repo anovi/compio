@@ -1,0 +1,38 @@
+---
+interface Props {
+  href: string
+}
+
+const { href } = Astro.props
+---
+
+<a href={href}><slot /><span aria-hidden="true">→</span></a>
+
+<style>
+  @layer components {
+    a {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 25px;
+      gap: 8px;
+      color: var(--website-text-primary);
+      font-size: 0.9rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    span {
+      transition: transform 150ms ease;
+    }
+
+    a:hover span {
+      transform: translateX(4px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      span {
+        transition: none;
+      }
+    }
+  }
+</style>

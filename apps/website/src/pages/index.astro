@@ -1,73 +1,112 @@
 ---
+import savedCalculations from '../assets/saved-calculations.svg'
+import demoVideo from '../assets/compio-demo-video.mp4'
+import * as CalculatorBlock from '../components/blocks/calculator-block'
+import Eyebrow from '../components/blocks/Eyebrow.astro'
+import * as HeroBlock from '../components/blocks/hero-block'
+import * as ImageBlock from '../components/blocks/image-block'
 import BaseLayout from '../layouts/BaseLayout.astro'
+
+const multiStepExample = `# Monthly budget
+income = 4_200 EUR
+
+rent = 1_450 EUR
+utilities = 185 EUR
+groceries = 520 EUR
+expenses = sum()
+left = income - expenses`
+
+const conversionExample = `# Weekend ride
+distance = 86 km
+fuel used = 5.8 L
+
+distance in mi
+fuel used in gal
+fuel price = 1.72 EUR
+cost = fuel price * num(fuel used)
+cost in USD`
 ---
 
 <BaseLayout
-  title="Compio embedded editor examples"
-  description="Try Compio calculations directly in the browser."
+  title="Compio — calculations that read like notes"
+  description="Work through everyday calculations step by step. Convert currencies and units, name values, and save useful calculations for later."
+  mainClass="home-page py-7"
 >
-  <main>
-    <header class="intro">
-      <p class="eyebrow">Compio</p>
-      <h1>Write calculations like notes</h1>
-      <p>Edit either example to see arithmetic, units, variables, and currency conversions update immediately.</p>
-    </header>
+  <HeroBlock.Root
+    class="mb-8"
+    videoSrc={demoVideo}
+    videoLabel="A demonstration of calculations updating in Compio"
+  >
+    <Eyebrow>A calmer way to calculate</Eyebrow>
+    <HeroBlock.Title>Think it through. Compio does the math.</HeroBlock.Title>
+    <HeroBlock.Description>A notebook-style calculator for the questions that take more than one line. Write naturally, see every step, and keep the useful bits for next time.</HeroBlock.Description>
+    <HeroBlock.Actions>
+      <HeroBlock.Action href="#live-example">Try the live calculator</HeroBlock.Action>
+      <HeroBlock.Action href="/docs" variant="quiet">Read the guide</HeroBlock.Action>
+    </HeroBlock.Actions>
+    <HeroBlock.Note>No sign-up · Works in your browser · Free to try</HeroBlock.Note>
+  </HeroBlock.Root>
 
-    <section class="examples" aria-label="Interactive calculator examples">
-      <article class="example">
-        <div class="example__copy">
-          <h2>Everyday arithmetic</h2>
-          <p>Mix regular calculations with compatible units.</p>
-        </div>
-        <div id="arithmetic-editor" class="editor-frame" aria-label="Arithmetic and units editor"></div>
-      </article>
+  <div id="live-example" class="section-anchor">
+    <CalculatorBlock.Root
+      class="mb-8"
+      document={multiStepExample}
+      editorLabel="Interactive monthly budget calculation"
+    >
+      <Eyebrow number="01">Multi-step calculations</Eyebrow>
+      <CalculatorBlock.Title>Keep the working, not just the answer.</CalculatorBlock.Title>
+      <CalculatorBlock.Description>Break a real question into readable steps. Name each value once, build on it below, and watch every result update the moment something changes.</CalculatorBlock.Description>
+      <CalculatorBlock.Hint>Try changing a number</CalculatorBlock.Hint>
+    </CalculatorBlock.Root>
+  </div>
 
-      <article class="example">
-        <div class="example__copy">
-          <h2>Variables and currencies</h2>
-          <p>Name values once, reuse them, and convert the result.</p>
-        </div>
-        <div id="currency-editor" class="editor-frame" aria-label="Variables and currencies editor"></div>
-      </article>
-    </section>
-  </main>
+  <CalculatorBlock.Root
+    class="mb-8"
+    document={conversionExample}
+    editorLabel="Interactive unit and currency conversion"
+    reverse
+  >
+    <Eyebrow number="02">Units & currencies</Eyebrow>
+    <CalculatorBlock.Title>Convert without breaking your train of thought.</CalculatorBlock.Title>
+    <CalculatorBlock.Description>Mix compatible units in the same calculation, or use plain words like “in” and “to” to convert the result. Live exchange rates make currencies just as easy.</CalculatorBlock.Description>
+    <CalculatorBlock.Hint>Try changing a number</CalculatorBlock.Hint>
+  </CalculatorBlock.Root>
+
+  <ImageBlock.Root
+    class="mb-8"
+    imageSrc={savedCalculations.src}
+    imageAlt="Two saved Compio calculation documents, a monthly budget and a trip plan"
+  >
+    <Eyebrow number="03">Saved calculations</Eyebrow>
+    <ImageBlock.Title>Your useful math, ready for another day.</ImageBlock.Title>
+    <ImageBlock.Description>Save the calculations you come back to—budgets, trip plans, invoices, recipes—and reuse the whole setup instead of rebuilding it from scratch.</ImageBlock.Description>
+    <ImageBlock.Link href="/docs">Explore everything Compio can do</ImageBlock.Link>
+  </ImageBlock.Root>
+
+  <section class="closing-card px-6 py-7" aria-labelledby="closing-title">
+    <p>Start with a number. End with a plan.</p>
+    <h2 id="closing-title">Your next calculation can be the easy one.</h2>
+    <a href="#live-example">Try Compio now <span aria-hidden="true">↗</span></a>
+  </section>
 
   <script>
     import { initializeRatesStore } from '@compio/calculator'
-    import { createEditor } from '@compio/editor'
-
-    const arithmeticRoot = document.querySelector('#arithmetic-editor')
-    const currencyRoot = document.querySelector('#currency-editor')
-
-    if (!(arithmeticRoot instanceof HTMLElement) || !(currencyRoot instanceof HTMLElement)) {
-      throw new Error('Embedded editor containers are missing')
-    }
+    import { createEditor, type EditorInstance } from '@compio/editor'
 
     const colorScheme = window.matchMedia('(prefers-color-scheme: dark)')
-    const isDark = colorScheme.matches
-    const editors = [
-      createEditor({
-        parent: arithmeticRoot,
-        isDark,
-        doc: `groceries = 48.50
-coffee = 4.25
-groceries + coffee
+    const editorRoots = document.querySelectorAll<HTMLElement>('[data-compio-example]')
+    const editors: EditorInstance[] = []
 
-distance = 10 km
-distance in mi`,
-      }),
-      createEditor({
-        parent: currencyRoot,
-        isDark,
-        doc: `monthly = 4_200 EUR
-rent = 1_450 EUR
-utilities = 185 EUR
-left = monthly - rent - utilities
-left in USD`,
-      }),
-    ]
+    for (const editorRoot of editorRoots) {
+      editors.push(createEditor({
+        parent: editorRoot,
+        doc: editorRoot.dataset.document ?? '',
+        isDark: colorScheme.matches,
+        mobileToolbar: false,
+      }))
+    }
 
-    void initializeRatesStore()
+    if (editors.length > 0) void initializeRatesStore()
 
     function syncColorScheme(event: MediaQueryListEvent) {
       document.documentElement.dataset.theme = event.matches ? 'dark' : 'light'
@@ -76,9 +115,62 @@ left in USD`,
 
     colorScheme.addEventListener('change', syncColorScheme)
 
-    window.addEventListener('pagehide', () => {
+    window.addEventListener('pagehide', (event) => {
+      if (event.persisted) return
+
       colorScheme.removeEventListener('change', syncColorScheme)
       for (const editor of editors) editor.destroy()
-    }, { once: true })
+    })
   </script>
 </BaseLayout>
+
+<style>
+  @layer components {
+    .section-anchor { scroll-margin-top: 32px; }
+
+    .closing-card {
+      overflow: hidden;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 88% 18%, rgb(255 255 255 / 16%) 0 6%, transparent 6.2%),
+        radial-gradient(circle at 88% 18%, transparent 0 13%, rgb(255 255 255 / 10%) 13.2% 13.8%, transparent 14%),
+        var(--website-accent);
+      color: #fff;
+      text-align: center;
+    }
+
+    .closing-card p {
+      margin: 0 0 14px;
+      color: rgb(255 255 255 / 72%);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .closing-card h2 {
+      max-width: 760px;
+      margin: 0 auto;
+      font-size: clamp(2.4rem, 5.5vw, 5.25rem);
+      font-weight: 610;
+      letter-spacing: -0.06em;
+      line-height: 0.98;
+      text-wrap: balance;
+    }
+
+    .closing-card a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 48px;
+      margin-top: 30px;
+      padding: 0 20px;
+      gap: 8px;
+      border-radius: 999px;
+      background: #fff;
+      color: #183330;
+      font-size: 0.92rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+  }
+</style>

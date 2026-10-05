@@ -6,17 +6,11 @@ import BaseLayout from '../layouts/BaseLayout.astro'
 <BaseLayout
   title="Compio user manual"
   description="Learn how to use Compio with interactive examples for calculations, variables, functions, and units."
+  mainClass="docs-shell"
 >
-  <header class="docs-header">
-    <a class="docs-header__brand" href="/">Compio</a>
-    <a class="docs-header__app" href="/">Examples</a>
-  </header>
-
-  <main class="docs-shell">
-    <article class="docs-content">
-      <UserManual />
-    </article>
-  </main>
+  <article class="docs-content">
+    <UserManual />
+  </article>
 
   <script>
     import { showPanel } from '@codemirror/view'

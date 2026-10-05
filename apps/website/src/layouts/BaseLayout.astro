@@ -4,9 +4,11 @@ import '../styles/global.css'
 interface Props {
   title: string
   description: string
+  mainClass?: string
 }
 
-const { title, description } = Astro.props
+const { title, description, mainClass } = Astro.props
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/'
 ---
 
 <!doctype html>
@@ -23,6 +25,26 @@ const { title, description } = Astro.props
     </script>
   </head>
   <body>
-    <slot />
+    <header class="site-header">
+      <div class="site-container site-header__inner">
+        <a class="site-header__brand" href="/">Compio</a>
+        <nav class="site-nav" aria-label="Primary navigation">
+          <a href="/" aria-current={currentPath === '/' ? 'page' : undefined}>Home</a>
+          <a href="/prices" aria-current={currentPath === '/prices' ? 'page' : undefined}>Prices</a>
+          <a href="/docs" aria-current={currentPath === '/docs' ? 'page' : undefined}>Docs</a>
+        </nav>
+      </div>
+    </header>
+    <main class:list={['site-container', 'site-main', mainClass]}>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="site-container site-footer__inner">
+        <nav class="site-footer__links" aria-label="Legal">
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+        </nav>
+      </div>
+    </footer>
   </body>
 </html>
