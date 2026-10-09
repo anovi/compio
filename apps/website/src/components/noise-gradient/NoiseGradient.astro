@@ -1,0 +1,19 @@
+---
+import './noise-gradient.css'
+---
+
+<canvas
+  class="noise-gradient__canvas"
+  data-noise-gradient
+  aria-hidden="true"
+></canvas>
+<div class="noise-gradient__grain" aria-hidden="true"></div>
+
+<script>
+  import { initializeNoiseGradients } from './noise-gradient'
+
+  const cleanupNoiseGradients = initializeNoiseGradients()
+  window.addEventListener('pagehide', (event) => {
+    if (!event.persisted) cleanupNoiseGradients()
+  }, { once: true })
+</script>
