@@ -50,6 +50,7 @@
     --website-radius-pill: 999px;
 
     --website-content-max-width: 1240px;
+    --website-header-height: 76px;
     --website-content-gutter: 16px;
     --website-space-0: 0;
     --website-space-1: 4px;
@@ -131,6 +132,8 @@
 
   html {
     scroll-behavior: smooth;
+    /* Keep anchored sections clear of the sticky header. */
+    scroll-padding-top: var(--website-header-height);
   }
 
   body {

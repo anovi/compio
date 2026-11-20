@@ -16,11 +16,16 @@ const { href, current = false } = Astro.props
       font-size: 15px;
       font-weight: 500;
       text-decoration: none;
+      transition: color 200ms ease;
     }
 
     .site-header-link:hover,
     .site-header-link[aria-current='page'] {
       color: var(--site-header-link-hover-color);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .site-header-link { transition: none; }
     }
 
     /* Keep the brand and the main action on one line on small phones. */

@@ -11,13 +11,18 @@ interface Props {
   description: string
   mainClass?: string
   /**
-   * `landing` leaves the header and page width to the page itself, so its
-   * first section can carry the navigation and span the full viewport width.
+   * `landing` leaves the page width to the page itself, so its first section
+   * can span the full viewport width.
    */
   variant?: 'page' | 'landing'
+  /**
+   * Id of a dark section at the top of the page. The header overlaps it with
+   * a transparent background and inverse colors until it scrolls past it.
+   */
+  headerInverseOver?: string
 }
 
-const { title, description, mainClass, variant = 'page' } = Astro.props
+const { title, description, mainClass, variant = 'page', headerInverseOver } = Astro.props
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/'
 ---
 
@@ -37,13 +42,11 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/'
     </script>
   </head>
   <body>
-    {variant === 'page' && (
-      <SiteHeader.Root>
-        <SiteHeader.Link href="/docs" current={currentPath === '/docs'}>User manual</SiteHeader.Link>
-        <SiteHeader.Link href="/prices" current={currentPath === '/prices'}>Prices</SiteHeader.Link>
-        <Button href={APP_URL}>Open Compio</Button>
-      </SiteHeader.Root>
-    )}
+    <SiteHeader.Root inverseOver={headerInverseOver}>
+      <SiteHeader.Link href="/docs" current={currentPath === '/docs'}>User manual</SiteHeader.Link>
+      <SiteHeader.Link href="/prices" current={currentPath === '/prices'}>Prices</SiteHeader.Link>
+      <Button href={APP_URL}>Open Compio</Button>
+    </SiteHeader.Root>
     <main class:list={[{ 'site-container': variant === 'page' }, mainClass]}>
       <slot />
     </main>

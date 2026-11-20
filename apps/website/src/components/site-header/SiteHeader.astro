@@ -1,13 +1,29 @@
 ---
+/** The site-wide header. It stays pinned to the top of the viewport. */
 interface Props {
-  tone?: 'default' | 'inverse'
+  /**
+   * Id of a dark section the header overlaps at the top of the page. The
+   * header is transparent with inverse colors while it sits over that section
+   * and switches to the default tone once it scrolls past it.
+   */
+  inverseOver?: string
   class?: string
 }
 
-const { tone = 'default', class: className } = Astro.props
+const { inverseOver, class: className } = Astro.props
 ---
 
-<header class:list={['site-header', `site-header--${tone}`, className]}>
+<header
+  class:list={[
+    'site-header',
+    {
+      'site-header--inverse': Boolean(inverseOver),
+      'site-header--overlay': Boolean(inverseOver),
+    },
+    className,
+  ]}
+  data-inverse-over={inverseOver}
+>
   <div class="site-container site-header__inner">
     <a class="site-header__brand" href="/">Compio</a>
     <nav class="site-header__nav" aria-label="Main">
@@ -19,24 +35,41 @@ const { tone = 'default', class: className } = Astro.props
 <style>
   @layer components {
     .site-header {
-      position: relative;
-      z-index: 1;
+      position: sticky;
+      top: 0;
+      /* Above CodeMirror's sticky panels (z-index 300) in embedded editors. */
+      z-index: 400;
+      background-color: var(--website-background);
+      transition: background-color 200ms ease;
       --site-header-brand-color: var(--website-text-strong);
       --site-header-link-color: var(--website-text-secondary);
       --site-header-link-hover-color: var(--website-text-strong);
+    }
+
+    /* Overlap the section below so its background shows through the header. */
+    .site-header--overlay {
+      margin-bottom: calc(-1 * var(--website-header-height));
     }
 
     .site-header--inverse {
       --site-header-brand-color: var(--website-inverse-text);
       --site-header-link-color: var(--website-inverse-text-secondary);
       --site-header-link-hover-color: var(--website-inverse-text);
+      /* Accent buttons in the header turn light over dark sections. */
+      --website-accent: var(--website-inverse-action-background);
+      --website-accent-hover: color-mix(in srgb, var(--website-inverse-action-background) 88%, var(--website-inverse-accent));
+      --brand-color-on-accent-primary: var(--website-inverse-action-text);
+    }
+
+    .site-header--overlay.site-header--inverse {
+      background-color: transparent;
     }
 
     .site-header__inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: 76px;
+      min-height: var(--website-header-height);
       padding: 16px 0;
       gap: 16px;
     }
@@ -47,6 +80,7 @@ const { tone = 'default', class: className } = Astro.props
       font-weight: 700;
       letter-spacing: -0.01em;
       text-decoration: none;
+      transition: color 200ms ease;
     }
 
     .site-header__brand:hover { color: var(--site-header-brand-color); }
@@ -56,5 +90,19 @@ const { tone = 'default', class: className } = Astro.props
       align-items: center;
       gap: 24px;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .site-header,
+      .site-header__brand { transition: none; }
+    }
   }
 </style>
+
+<script>
+  import { initializeHeaderTone } from './header-tone'
+
+  const cleanupHeaderTone = initializeHeaderTone()
+  window.addEventListener('pagehide', (event) => {
+    if (!event.persisted) cleanupHeaderTone()
+  }, { once: true })
+</script>

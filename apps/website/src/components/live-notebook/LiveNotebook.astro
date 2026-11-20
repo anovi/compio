@@ -1,0 +1,89 @@
+---
+/**
+ * An editable Compio notebook powered by the embedded editor. The document is
+ * rendered as a plain-text fallback and replaced by a live editor on load.
+ */
+interface Props {
+  document: string
+  label: string
+  caption?: string
+  class?: string
+}
+
+const { document, label, caption, class: className } = Astro.props
+---
+
+<figure class:list={['live-notebook', className]}>
+  <div class="live-notebook__editor" data-compio-example data-document={document} aria-label={label}>
+    <pre class="live-notebook__fallback">{document}</pre>
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<script>
+  import { initializeRatesStore } from '@compio/calculator'
+  import { createEditor, type EditorInstance } from '@compio/editor'
+
+  const colorScheme = window.matchMedia('(prefers-color-scheme: dark)')
+  const editorRoots = document.querySelectorAll<HTMLElement>('[data-compio-example]')
+  const editors: EditorInstance[] = []
+
+  for (const editorRoot of editorRoots) {
+    const doc = editorRoot.dataset.document ?? ''
+    editorRoot.replaceChildren()
+    editors.push(createEditor({
+      parent: editorRoot,
+      doc,
+      isDark: colorScheme.matches,
+      mobileToolbar: false,
+    }))
+  }
+
+  if (editors.length > 0) void initializeRatesStore()
+
+  function syncColorScheme(event: MediaQueryListEvent) {
+    document.documentElement.dataset.theme = event.matches ? 'dark' : 'light'
+    for (const editor of editors) editor.setColorScheme(event.matches)
+  }
+
+  colorScheme.addEventListener('change', syncColorScheme)
+
+  window.addEventListener('pagehide', (event) => {
+    // A persisted page is restored from the back/forward cache without
+    // rerunning this script, so keep its editors alive.
+    if (event.persisted) return
+
+    colorScheme.removeEventListener('change', syncColorScheme)
+    for (const editor of editors) editor.destroy()
+  })
+</script>
+
+<style>
+  @layer components {
+    .live-notebook { margin: 0; }
+
+    .live-notebook__editor {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--website-editor-border);
+      border-radius: var(--website-radius-lg);
+      background: var(--brand-color-background);
+    }
+
+    .live-notebook__fallback {
+      margin: 0;
+      padding: 12px;
+      overflow-x: auto;
+      color: var(--brand-color-text-primary);
+      font-family: var(--brand-font-mono);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    figcaption {
+      margin-top: 12px;
+      font-size: 13.6px;
+      line-height: 1.4;
+    }
+  }
+</style>

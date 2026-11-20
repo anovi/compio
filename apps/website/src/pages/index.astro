@@ -6,10 +6,8 @@ import * as CtaBlock from '../components/blocks/cta-block'
 import * as FeatureBlock from '../components/blocks/feature-block'
 import * as HeroBlock from '../components/blocks/hero-block'
 import * as InfoCards from '../components/blocks/info-cards'
-import NotebookSample, { type NotebookSampleLine } from '../components/notebook-sample/NotebookSample.astro'
+import LiveNotebook from '../components/live-notebook/LiveNotebook.astro'
 import SavedList, { type SavedListItem } from '../components/saved-list/SavedList.astro'
-import * as SiteHeader from '../components/site-header'
-import Button from '../components/ui/Button.astro'
 import CallToAction from '../components/ui/CallToAction.astro'
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { APP_URL } from '../site'
@@ -21,19 +19,21 @@ const chapters: HeroBlock.Chapter[] = [
   { title: 'Works offline, on every device', start: 40.8 },
 ]
 
-const currencySample: NotebookSampleLine[] = [
-  { text: '# Weekend in Belgrade' },
-  { text: 'train: 49 EUR' },
-  { text: 'hostel: 2 * 3 200 RSD', result: '6 400 RSD' },
-  { text: 'dinner: 85 USD' },
-  { text: 'total: train + hostel + dinner in EUR', result: '182.2 EUR' },
-]
+const currencyExample = `# Weekend in Belgrade
+train = 49 EUR
+hostel = 2 * 3_200 RSD
+dinner = 85 USD
+total = train + hostel + dinner in EUR`
 
-const unitSample: NotebookSampleLine[] = [
-  { text: '10 km in mi', result: '6.21 mi' },
-  { text: '2 kg in lb', result: '4.41 lb' },
-  { text: '100 cm + 1 m', result: '2 m' },
-]
+const conversionExample = `# Weekend ride
+distance = 86 km
+fuel used = 5.8 L
+
+distance in mi
+fuel used in gal
+fuel price = 1.72 EUR
+cost = fuel price * num(fuel used)
+cost in USD`
 
 const savedCalculations: SavedListItem[] = [
   { title: 'Monthly budget', edited: 'Edited 2 min ago', selected: true },
@@ -47,18 +47,14 @@ const savedCalculations: SavedListItem[] = [
   title="Compio — a calculator that works like a notebook"
   description="Work through everyday calculations step by step. Convert currencies and units, and save useful calculations for later. No account required, works offline."
   variant="landing"
+  headerInverseOver="hero"
 >
   <HeroBlock.Root
+    id="hero"
     videoId="hero-video"
     videoSrc={demoVideo}
     videoLabel="Compio demo: calculations, saved notebooks, currencies and units, offline"
   >
-    <SiteHeader.Root slot="header" tone="inverse">
-      <SiteHeader.Link href="#units">Units &amp; currencies</SiteHeader.Link>
-      <SiteHeader.Link href="#offline">Offline</SiteHeader.Link>
-      <Button href="#get" tone="inverse">Get Compio</Button>
-    </SiteHeader.Root>
-
     <HeroBlock.Title>A calculator that works like a notebook.</HeroBlock.Title>
     <HeroBlock.Chapters videoId="hero-video" chapters={chapters} />
     <CallToAction href={APP_URL} note="No account required. Works offline.">Open the app</CallToAction>
@@ -80,11 +76,11 @@ const savedCalculations: SavedListItem[] = [
       <FeatureBlock.Title>Currencies</FeatureBlock.Title>
       <FeatureBlock.Lead>Planning a trip abroad? Splitting expenses with friends? Managing money across countries?</FeatureBlock.Lead>
       <FeatureBlock.Description>Add amounts in different currencies in the same calculation. Compio converts them automatically using the latest available exchange rates.</FeatureBlock.Description>
-      <NotebookSample
+      <LiveNotebook
         slot="media"
-        lines={currencySample}
-        label="A Compio notebook adding a train ticket in euros, a hostel in dinars and a dinner in dollars, totalled in euros"
-        caption="Example rates."
+        document={currencyExample}
+        label="Interactive Compio notebook adding a train ticket in euros, a hostel in dinars and a dinner in dollars, totalled in euros"
+        caption="Try changing a number."
       />
     </FeatureBlock.Row>
 
@@ -92,10 +88,11 @@ const savedCalculations: SavedListItem[] = [
       <FeatureBlock.Title>Units</FeatureBlock.Title>
       <FeatureBlock.Lead>Convert distances, weights, volumes, time, and more, without switching to another tool.</FeatureBlock.Lead>
       <FeatureBlock.Description>Mix compatible units in a calculation or convert a result into the unit you need.</FeatureBlock.Description>
-      <NotebookSample
+      <LiveNotebook
         slot="media"
-        lines={unitSample}
-        label="Compio converting kilometres to miles and kilograms to pounds, and adding centimetres to metres"
+        document={conversionExample}
+        label="Interactive Compio notebook converting a ride's distance to miles, fuel to gallons and its cost to dollars"
+        caption="Try changing a number."
       />
     </FeatureBlock.Row>
   </FeatureBlock.Root>

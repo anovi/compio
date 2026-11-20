@@ -2,18 +2,18 @@
 import { Sunlight } from '../../sunlight'
 
 interface Props {
+  id?: string
   videoId: string
   videoSrc: string
   videoLabel: string
   class?: string
 }
 
-const { videoId, videoSrc, videoLabel, class: className } = Astro.props
+const { id, videoId, videoSrc, videoLabel, class: className } = Astro.props
 ---
 
-<section class:list={['hero-block', className]}>
+<section class:list={['hero-block', className]} id={id}>
   <Sunlight />
-  <slot name="header" />
 
   <div class="site-container hero-block__body">
     <div class="hero-block__copy">
@@ -47,6 +47,8 @@ const { videoId, videoSrc, videoLabel, class: className } = Astro.props
       position: relative;
       isolation: isolate;
       overflow: hidden;
+      /* Leave room for the sticky header that overlaps the hero. */
+      padding-top: var(--website-header-height);
       background: var(--website-inverse-background);
       color: var(--website-inverse-text);
     }
