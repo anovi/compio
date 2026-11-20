@@ -1,0 +1,24 @@
+---
+interface Props {
+  class?: string
+}
+
+const { class: className } = Astro.props
+---
+
+<section class:list={['info-cards', className]}>
+  <div class="site-container info-cards__grid">
+    <slot />
+  </div>
+</section>
+
+<style>
+  @layer components {
+    .info-cards__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+      padding: 48px 0;
+      gap: 24px;
+    }
+  }
+</style>

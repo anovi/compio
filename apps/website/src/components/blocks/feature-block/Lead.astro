@@ -1,0 +1,16 @@
+<p><slot /></p>
+
+<style>
+  @layer components {
+    p {
+      margin: 0;
+      color: var(--website-text-strong);
+      font-size: 24px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 520px) {
+      p { font-size: 21px; }
+    }
+  }
+</style>

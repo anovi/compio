@@ -1,0 +1,68 @@
+---
+interface Props {
+  title: string
+  id?: string
+}
+
+const { title, id } = Astro.props
+---
+
+<article class="info-card" id={id}>
+  <div class="info-card__copy">
+    <h2>{title}</h2>
+    <p><slot /></p>
+  </div>
+  <div class="info-card__icon"><slot name="icon" /></div>
+</article>
+
+<style>
+  @layer components {
+    .info-card {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      padding: 28px 32px;
+      gap: 24px;
+      border: 1px solid var(--website-border);
+      border-radius: var(--website-radius-lg);
+      scroll-margin-top: 24px;
+    }
+
+    .info-card__copy {
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      min-width: 0;
+      gap: 6px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    p {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .info-card__icon {
+      display: flex;
+      flex: none;
+      color: var(--website-icon);
+    }
+
+    .info-card__icon > :global(svg) {
+      display: block;
+      width: auto;
+      height: 48px;
+    }
+
+    @media (max-width: 520px) {
+      .info-card { padding: 24px; }
+      .info-card__icon > :global(svg) { height: 36px; }
+    }
+  }
+</style>

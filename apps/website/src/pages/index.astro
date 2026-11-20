@@ -1,176 +1,108 @@
 ---
-import savedCalculations from '../assets/saved-calculations.svg'
-import demoVideo from '../assets/compio-demo-video.mp4'
-import * as CalculatorBlock from '../components/blocks/calculator-block'
-import Eyebrow from '../components/blocks/Eyebrow.astro'
+import demoVideo from '../assets/compio-demo.mp4'
+import DevicesIcon from '../assets/icons/devices.svg'
+import OfflineIcon from '../assets/icons/offline.svg'
+import * as CtaBlock from '../components/blocks/cta-block'
+import * as FeatureBlock from '../components/blocks/feature-block'
 import * as HeroBlock from '../components/blocks/hero-block'
-import * as ImageBlock from '../components/blocks/image-block'
+import * as InfoCards from '../components/blocks/info-cards'
+import NotebookSample, { type NotebookSampleLine } from '../components/notebook-sample/NotebookSample.astro'
+import SavedList, { type SavedListItem } from '../components/saved-list/SavedList.astro'
+import * as SiteHeader from '../components/site-header'
+import Button from '../components/ui/Button.astro'
+import CallToAction from '../components/ui/CallToAction.astro'
 import BaseLayout from '../layouts/BaseLayout.astro'
+import { APP_URL } from '../site'
 
-const multiStepExample = `# Monthly budget
-income = 4_200 EUR
+const chapters: HeroBlock.Chapter[] = [
+  { title: 'Math that keeps up', start: 0 },
+  { title: 'Reuse saved calculations', start: 12.4 },
+  { title: 'Currencies and unit conversion', start: 24.8 },
+  { title: 'Works offline, on every device', start: 40.8 },
+]
 
-rent = 1_450 EUR
-utilities = 185 EUR
-groceries = 520 EUR
-expenses = sum()
-left = income - expenses`
+const currencySample: NotebookSampleLine[] = [
+  { text: '# Weekend in Belgrade' },
+  { text: 'train: 49 EUR' },
+  { text: 'hostel: 2 * 3 200 RSD', result: '6 400 RSD' },
+  { text: 'dinner: 85 USD' },
+  { text: 'total: train + hostel + dinner in EUR', result: '182.2 EUR' },
+]
 
-const conversionExample = `# Weekend ride
-distance = 86 km
-fuel used = 5.8 L
+const unitSample: NotebookSampleLine[] = [
+  { text: '10 km in mi', result: '6.21 mi' },
+  { text: '2 kg in lb', result: '4.41 lb' },
+  { text: '100 cm + 1 m', result: '2 m' },
+]
 
-distance in mi
-fuel used in gal
-fuel price = 1.72 EUR
-cost = fuel price * num(fuel used)
-cost in USD`
+const savedCalculations: SavedListItem[] = [
+  { title: 'Monthly budget', edited: 'Edited 2 min ago', selected: true },
+  { title: 'Weekend in Belgrade', edited: 'Yesterday' },
+  { title: 'Freelance invoice — October', edited: '3 days ago' },
+  { title: 'Pancakes for six', edited: 'Last week' },
+]
 ---
 
 <BaseLayout
-  title="Compio — calculations that read like notes"
-  description="Work through everyday calculations step by step. Convert currencies and units, name values, and save useful calculations for later."
-  mainClass="home-page py-7"
+  title="Compio — a calculator that works like a notebook"
+  description="Work through everyday calculations step by step. Convert currencies and units, and save useful calculations for later. No account required, works offline."
+  variant="landing"
 >
   <HeroBlock.Root
-    class="mb-8"
+    videoId="hero-video"
     videoSrc={demoVideo}
-    videoLabel="A demonstration of calculations updating in Compio"
+    videoLabel="Compio demo: calculations, saved notebooks, currencies and units, offline"
   >
-    <Eyebrow>A calmer way to calculate</Eyebrow>
-    <HeroBlock.Title>Think it through. Compio does the math.</HeroBlock.Title>
-    <HeroBlock.Description>A notebook-style calculator for the questions that take more than one line. Write naturally, see every step, and keep the useful bits for next time.</HeroBlock.Description>
-    <HeroBlock.Actions>
-      <HeroBlock.Action href="#live-example">Try the live calculator</HeroBlock.Action>
-      <HeroBlock.Action href="/docs" variant="quiet">Read the guide</HeroBlock.Action>
-    </HeroBlock.Actions>
-    <HeroBlock.Note>No sign-up · Works in your browser · Free to try</HeroBlock.Note>
+    <SiteHeader.Root slot="header" tone="inverse">
+      <SiteHeader.Link href="#units">Units &amp; currencies</SiteHeader.Link>
+      <SiteHeader.Link href="#offline">Offline</SiteHeader.Link>
+      <Button href="#get" tone="inverse">Get Compio</Button>
+    </SiteHeader.Root>
+
+    <HeroBlock.Title>A calculator that works like a notebook.</HeroBlock.Title>
+    <HeroBlock.Chapters videoId="hero-video" chapters={chapters} />
+    <CallToAction href={APP_URL} note="No account required. Works offline.">Open the app</CallToAction>
   </HeroBlock.Root>
 
-  <div id="live-example" class="section-anchor">
-    <CalculatorBlock.Root
-      class="mb-8"
-      document={multiStepExample}
-      editorLabel="Interactive monthly budget calculation"
-    >
-      <Eyebrow number="01">Multi-step calculations</Eyebrow>
-      <CalculatorBlock.Title>Keep the working, not just the answer.</CalculatorBlock.Title>
-      <CalculatorBlock.Description>Break a real question into readable steps. Name each value once, build on it below, and watch every result update the moment something changes.</CalculatorBlock.Description>
-      <CalculatorBlock.Hint>Try changing a number</CalculatorBlock.Hint>
-    </CalculatorBlock.Root>
-  </div>
+  <InfoCards.Root>
+    <InfoCards.Card title="On your computer and your phone">
+      Install Compio and use it like a regular app.
+      <DevicesIcon slot="icon" aria-hidden="true" />
+    </InfoCards.Card>
+    <InfoCards.Card id="offline" title="Works offline">
+      Your notebooks and previously fetched exchange rates stay available without a connection.
+      <OfflineIcon slot="icon" aria-hidden="true" />
+    </InfoCards.Card>
+  </InfoCards.Root>
 
-  <CalculatorBlock.Root
-    class="mb-8"
-    document={conversionExample}
-    editorLabel="Interactive unit and currency conversion"
-    reverse
-  >
-    <Eyebrow number="02">Units & currencies</Eyebrow>
-    <CalculatorBlock.Title>Convert without breaking your train of thought.</CalculatorBlock.Title>
-    <CalculatorBlock.Description>Mix compatible units in the same calculation, or use plain words like “in” and “to” to convert the result. Live exchange rates make currencies just as easy.</CalculatorBlock.Description>
-    <CalculatorBlock.Hint>Try changing a number</CalculatorBlock.Hint>
-  </CalculatorBlock.Root>
+  <FeatureBlock.Root id="units" eyebrow="Units & currencies" title="Convert without breaking your train of thought">
+    <FeatureBlock.Row>
+      <FeatureBlock.Title>Currencies</FeatureBlock.Title>
+      <FeatureBlock.Lead>Planning a trip abroad? Splitting expenses with friends? Managing money across countries?</FeatureBlock.Lead>
+      <FeatureBlock.Description>Add amounts in different currencies in the same calculation. Compio converts them automatically using the latest available exchange rates.</FeatureBlock.Description>
+      <NotebookSample
+        slot="media"
+        lines={currencySample}
+        label="A Compio notebook adding a train ticket in euros, a hostel in dinars and a dinner in dollars, totalled in euros"
+        caption="Example rates."
+      />
+    </FeatureBlock.Row>
 
-  <ImageBlock.Root
-    class="mb-8"
-    imageSrc={savedCalculations.src}
-    imageAlt="Two saved Compio calculation documents, a monthly budget and a trip plan"
-  >
-    <Eyebrow number="03">Saved calculations</Eyebrow>
-    <ImageBlock.Title>Your useful math, ready for another day.</ImageBlock.Title>
-    <ImageBlock.Description>Save the calculations you come back to—budgets, trip plans, invoices, recipes—and reuse the whole setup instead of rebuilding it from scratch.</ImageBlock.Description>
-    <ImageBlock.Link href="/docs">Explore everything Compio can do</ImageBlock.Link>
-  </ImageBlock.Root>
+    <FeatureBlock.Row reverse>
+      <FeatureBlock.Title>Units</FeatureBlock.Title>
+      <FeatureBlock.Lead>Convert distances, weights, volumes, time, and more, without switching to another tool.</FeatureBlock.Lead>
+      <FeatureBlock.Description>Mix compatible units in a calculation or convert a result into the unit you need.</FeatureBlock.Description>
+      <NotebookSample
+        slot="media"
+        lines={unitSample}
+        label="Compio converting kilometres to miles and kilograms to pounds, and adding centimetres to metres"
+      />
+    </FeatureBlock.Row>
+  </FeatureBlock.Root>
 
-  <section class="closing-card px-6 py-7" aria-labelledby="closing-title">
-    <p>Start with a number. End with a plan.</p>
-    <h2 id="closing-title">Your next calculation can be the easy one.</h2>
-    <a href="#live-example">Try Compio now <span aria-hidden="true">↗</span></a>
-  </section>
-
-  <script>
-    import { initializeRatesStore } from '@compio/calculator'
-    import { createEditor, type EditorInstance } from '@compio/editor'
-
-    const colorScheme = window.matchMedia('(prefers-color-scheme: dark)')
-    const editorRoots = document.querySelectorAll<HTMLElement>('[data-compio-example]')
-    const editors: EditorInstance[] = []
-
-    for (const editorRoot of editorRoots) {
-      editors.push(createEditor({
-        parent: editorRoot,
-        doc: editorRoot.dataset.document ?? '',
-        isDark: colorScheme.matches,
-        mobileToolbar: false,
-      }))
-    }
-
-    if (editors.length > 0) void initializeRatesStore()
-
-    function syncColorScheme(event: MediaQueryListEvent) {
-      document.documentElement.dataset.theme = event.matches ? 'dark' : 'light'
-      for (const editor of editors) editor.setColorScheme(event.matches)
-    }
-
-    colorScheme.addEventListener('change', syncColorScheme)
-
-    window.addEventListener('pagehide', (event) => {
-      if (event.persisted) return
-
-      colorScheme.removeEventListener('change', syncColorScheme)
-      for (const editor of editors) editor.destroy()
-    })
-  </script>
+  <CtaBlock.Root id="get" eyebrow="Saved calculations" title="Your calculations are always at hand">
+    <CtaBlock.Description>Save the calculations you come back to—budgets, trip plans, invoices, recipes—and reuse the whole setup instead of rebuilding it from scratch.</CtaBlock.Description>
+    <CallToAction class="pt-4" href={APP_URL} note="No account required.">Open Compio &amp; Install</CallToAction>
+    <SavedList slot="media" title="Saved calculations" items={savedCalculations} />
+  </CtaBlock.Root>
 </BaseLayout>
-
-<style>
-  @layer components {
-    .section-anchor { scroll-margin-top: 32px; }
-
-    .closing-card {
-      overflow: hidden;
-      border-radius: 28px;
-      background:
-        radial-gradient(circle at 88% 18%, rgb(255 255 255 / 16%) 0 6%, transparent 6.2%),
-        radial-gradient(circle at 88% 18%, transparent 0 13%, rgb(255 255 255 / 10%) 13.2% 13.8%, transparent 14%),
-        var(--website-accent);
-      color: #fff;
-      text-align: center;
-    }
-
-    .closing-card p {
-      margin: 0 0 14px;
-      color: rgb(255 255 255 / 72%);
-      font-size: 0.75rem;
-      font-weight: 750;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .closing-card h2 {
-      max-width: 760px;
-      margin: 0 auto;
-      font-size: clamp(2.4rem, 5.5vw, 5.25rem);
-      font-weight: 610;
-      letter-spacing: -0.06em;
-      line-height: 0.98;
-      text-wrap: balance;
-    }
-
-    .closing-card a {
-      display: inline-flex;
-      align-items: center;
-      min-height: 48px;
-      margin-top: 30px;
-      padding: 0 20px;
-      gap: 8px;
-      border-radius: 999px;
-      background: #fff;
-      color: #183330;
-      font-size: 0.92rem;
-      font-weight: 750;
-      text-decoration: none;
-    }
-  }
-</style>

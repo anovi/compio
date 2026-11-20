@@ -1,0 +1,26 @@
+---
+interface Props {
+  tone?: 'default' | 'inverse'
+  class?: string
+}
+
+const { tone = 'default', class: className } = Astro.props
+---
+
+<p class:list={['eyebrow', `eyebrow--${tone}`, className]}><slot /></p>
+
+<style>
+  @layer components {
+    .eyebrow {
+      margin: 0;
+      color: var(--website-accent);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow--inverse { color: var(--website-inverse-accent); }
+  }
+</style>

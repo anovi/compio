@@ -1,0 +1,83 @@
+---
+export interface SavedListItem {
+  title: string
+  edited: string
+  selected?: boolean
+}
+
+interface Props {
+  title: string
+  items: SavedListItem[]
+  class?: string
+}
+
+const { title, items, class: className } = Astro.props
+---
+
+<figure class:list={['saved-list', className]}>
+  <figcaption>{title}</figcaption>
+  <ul>
+    {items.map((item) => (
+      <li class:list={{ 'saved-list__item--selected': item.selected }}>
+        <span class="saved-list__title">{item.title}</span>
+        <span class="saved-list__edited">{item.edited}</span>
+      </li>
+    ))}
+  </ul>
+</figure>
+
+<style>
+  @layer components {
+    .saved-list {
+      margin: 0;
+      padding: 28px;
+      border-radius: var(--website-radius-lg);
+      background: var(--website-background);
+      color: var(--website-text-primary);
+    }
+
+    figcaption {
+      padding: 0 12px 20px;
+      color: var(--website-text-strong);
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+    }
+
+    ul {
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      padding: 0;
+      gap: 4px;
+      list-style: none;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 12px;
+      gap: 16px;
+      border-radius: var(--website-radius-sm);
+    }
+
+    .saved-list__item--selected { background: var(--website-surface); }
+
+    .saved-list__title {
+      color: var(--website-text-strong);
+      font-size: 17px;
+      font-weight: 500;
+    }
+
+    .saved-list__edited {
+      flex: none;
+      font-size: 14px;
+    }
+
+    @media (max-width: 520px) {
+      .saved-list { padding: 16px; }
+    }
+  }
+</style>
