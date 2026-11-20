@@ -1,0 +1,31 @@
+---
+interface Props {
+  href: string
+  current?: boolean
+}
+
+const { href, current = false } = Astro.props
+---
+
+<a class="site-header-link" href={href} aria-current={current ? 'page' : undefined}><slot /></a>
+
+<style>
+  @layer components {
+    .site-header-link {
+      color: var(--site-header-link-color);
+      font-size: 15px;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .site-header-link:hover,
+    .site-header-link[aria-current='page'] {
+      color: var(--site-header-link-hover-color);
+    }
+
+    /* Keep the brand and the main action on one line on small phones. */
+    @media (max-width: 560px) {
+      .site-header-link { display: none; }
+    }
+  }
+</style>

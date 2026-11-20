@@ -1,0 +1,104 @@
+---
+export interface Chapter {
+  title: string
+  /** Start time in the video, in seconds. */
+  start: number
+}
+
+interface Props {
+  /** `id` of the hero video these chapters control. */
+  videoId: string
+  chapters: Chapter[]
+  label?: string
+}
+
+const { videoId, chapters, label = 'Jump to a part of the video' } = Astro.props
+---
+
+<div class="hero-chapters" role="group" aria-label={label} data-hero-chapters={videoId}>
+  {chapters.map((chapter, index) => (
+    <button
+      class="hero-chapters__item"
+      type="button"
+      aria-controls={videoId}
+      aria-current={index === 0 ? 'true' : undefined}
+      data-start={chapter.start}
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle class="hero-chapters__track" cx="12" cy="12" r="9" />
+        <circle class="hero-chapters__progress" cx="12" cy="12" r="9" pathLength="1" />
+      </svg>
+      <span>{chapter.title}</span>
+    </button>
+  ))}
+</div>
+
+<style>
+  @layer components {
+    .hero-chapters {
+      display: flex;
+      flex-direction: column;
+      width: calc(100% + 18px);
+      max-width: 460px;
+      margin-left: -18px;
+      gap: 4px;
+    }
+
+    .hero-chapters__item {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      padding: 14px 18px;
+      gap: 16px;
+      border: 0;
+      border-radius: var(--website-radius-md);
+      background: transparent;
+      color: var(--website-inverse-text-muted);
+      font: inherit;
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 150ms ease, color 150ms ease;
+    }
+
+    .hero-chapters__item:hover { color: var(--website-inverse-text-secondary); }
+
+    .hero-chapters__item[aria-current='true'] {
+      background: var(--website-inverse-surface);
+      color: var(--website-inverse-text);
+      font-weight: 600;
+    }
+
+    svg {
+      flex: none;
+      transform: rotate(-90deg);
+    }
+
+    circle {
+      stroke-width: 2.5;
+    }
+
+    .hero-chapters__track { stroke: var(--website-inverse-track); }
+
+    .hero-chapters__progress {
+      stroke: var(--website-inverse-accent);
+      stroke-dasharray: 1;
+      stroke-dashoffset: calc(1 - var(--chapter-progress, 0));
+      stroke-linecap: round;
+      visibility: hidden;
+    }
+
+    [aria-current='true'] .hero-chapters__progress { visibility: visible; }
+
+    @media (max-width: 520px) {
+      .hero-chapters__item { font-size: 19px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-chapters__item { transition: none; }
+    }
+  }
+</style>

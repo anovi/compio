@@ -1,0 +1,51 @@
+<footer class="site-footer">
+  <div class="site-container site-footer__inner">
+    <a class="site-footer__brand" href="/">Compio</a>
+    <p>Your notebooks are saved locally on your device and aren’t synced between devices. Currency conversions use the latest available exchange rates when online, or previously cached rates when offline.</p>
+    <nav class="site-footer__links" aria-label="Site">
+      <a href="/docs">User manual</a>
+      <a href="/prices">Prices</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  @layer components {
+    .site-footer { margin-top: auto; }
+
+    .site-footer__inner {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 48px 0 64px;
+    }
+
+    .site-footer__brand {
+      align-self: flex-start;
+      color: var(--website-text-strong);
+      font-size: 22px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .site-footer__brand:hover { color: var(--website-text-strong); }
+
+    p {
+      max-width: 720px;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .site-footer__links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 24px;
+      font-size: 14px;
+    }
+
+    .site-footer__links a { color: var(--website-text-secondary); }
+    .site-footer__links a:hover { color: var(--website-text-strong); }
+  }
+</style>

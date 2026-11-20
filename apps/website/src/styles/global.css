@@ -6,19 +6,51 @@
 @layer theme {
   :root {
     color-scheme: light dark;
-    --website-background: #f5f4ef;
-    --website-text-primary: #202225;
-    --website-text-secondary: #64666b;
+    --website-font-sans: 'Figtree Variable', var(--brand-font-sans);
+    --website-font-mono: var(--brand-font-mono);
+
+    --website-background: #f8f8f6;
+    --website-text-strong: #031717;
+    --website-text-primary: #3a4048;
+    --website-text-secondary: #67696d;
     --website-text-tertiary: #85867f;
+    --website-border: #e6e6e0;
+    --website-surface: #e6e6e0;
+    --website-icon: #0f3d39;
+    --website-accent: var(--brand-color-accent);
+    --website-accent-hover: #11524e;
+    --website-accent-soft: #cce6df;
+    --website-focus-ring: #5ec9b6;
     --website-editor-border: rgb(0 0 0 / 14%);
     --website-divider: rgb(0 0 0 / 10%);
-    --website-accent: #19706a;
-    --website-accent-soft: #cce6df;
-    --website-highlight-soft: #e9be6c;
-    --website-surface: #eeece5;
-    --website-surface-strong: #dfe8e3;
+
+    /* Deep green sections (hero, call to action) keep these in both color schemes. */
+    --website-inverse-background: #0f3d39;
+    --website-inverse-text: #ffffff;
+    --website-inverse-text-secondary: #d5e6e2;
+    --website-inverse-text-muted: #a8c4be;
+    --website-inverse-accent: #5ec9b6;
+    --website-inverse-track: rgb(255 255 255 / 18%);
+    --website-inverse-surface: rgb(255 255 255 / 7%);
+    --website-inverse-control: rgb(255 255 255 / 10%);
+    --website-inverse-action-background: #ffffff;
+    --website-inverse-action-text: #031717;
+
+    /* Static calculation samples mirror the editor's syntax colors. */
+    --website-syntax-base: #000000;
+    --website-syntax-label: var(--brand-color-accent);
+    --website-syntax-operator: #8a2aff;
+    --website-syntax-comment: #67696d;
+    --website-result-background: var(--brand-color-accent);
+    --website-result-text: var(--brand-color-on-accent-primary);
+
+    --website-radius-sm: 6px;
+    --website-radius-md: 16px;
+    --website-radius-lg: 24px;
+    --website-radius-pill: 999px;
+
     --website-content-max-width: 1240px;
-    --website-content-gutter: 14px;
+    --website-content-gutter: 16px;
     --website-space-0: 0;
     --website-space-1: 4px;
     --website-space-2: 8px;
@@ -33,22 +65,28 @@
   @media (prefers-color-scheme: dark) {
     :root {
       --website-background: #151719;
-      --website-text-primary: #f5f5f2;
+      --website-text-strong: #f5f5f2;
+      --website-text-primary: #cfd2d5;
       --website-text-secondary: #aeb0b4;
       --website-text-tertiary: #83878a;
+      --website-border: rgb(255 255 255 / 12%);
+      --website-surface: #26342f;
+      --website-icon: #68c7bf;
+      --website-accent: #68c7bf;
+      --website-accent-hover: #8ad8d1;
+      --website-accent-soft: #254843;
       --website-editor-border: var(--brand-color-border-2);
       --website-divider: rgb(255 255 255 / 12%);
-      --website-accent: #68c7bf;
-      --website-accent-soft: #254843;
-      --website-highlight-soft: #80622c;
-      --website-surface: #1d2022;
-      --website-surface-strong: #26342f;
+      --website-syntax-base: #ffffff;
+      --website-syntax-label: var(--brand-color-accent-text);
+      --website-syntax-operator: #c59bff;
+      --website-syntax-comment: var(--brand-color-text-secondary);
     }
   }
 
   @media (min-width: 521px) {
     :root {
-      --website-content-gutter: 20px;
+      --website-content-gutter: 24px;
     }
   }
 
@@ -81,7 +119,7 @@
 
 @layer base {
   :root {
-    font-family: var(--brand-font-sans);
+    font-family: var(--website-font-sans);
     background: var(--website-background);
     color: var(--website-text-primary);
     font-size: 16px;
@@ -89,6 +127,10 @@
 
   * {
     box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
@@ -99,10 +141,6 @@
     line-height: 1.5;
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
-
   ::selection {
     background: var(--website-accent-soft);
   }
@@ -110,21 +148,43 @@
   h1,
   h2,
   h3,
-  p {
+  p,
+  figure {
     margin-top: 0;
   }
 
   h1,
   h2,
-  h3  {
+  h3 {
+    color: var(--website-text-strong);
     letter-spacing: -0.01em;
+    text-wrap: balance;
   }
 
   h1 {
     margin-bottom: 16px;
     font-size: clamp(2.5rem, 7vw, 4.75rem);
     line-height: 0.98;
-    letter-spacing: -0.01em;
+  }
+
+  a {
+    color: var(--website-accent);
+  }
+
+  a:hover {
+    color: var(--website-accent-hover);
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--website-focus-ring);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 }
 
@@ -280,124 +340,6 @@
     margin-left: auto;
   }
 
-  .site-header {
-    position: relative;
-    z-index: 10;
-    border-bottom: 1px solid var(--website-divider);
-    background: color-mix(in srgb, var(--website-background) 88%, transparent);
-    backdrop-filter: blur(16px);
-  }
-
-  .site-header__inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 72px;
-    gap: 32px;
-  }
-
-  .site-header__brand,
-  .site-nav a,
-  .site-footer a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .site-header__brand {
-    font-size: 1.25rem;
-    font-weight: 750;
-    letter-spacing: -0.045em;
-  }
-
-  .site-nav {
-    display: flex;
-    align-items: center;
-    gap: clamp(20px, 4vw, 40px);
-  }
-
-  .site-nav a,
-  .site-footer a {
-    color: var(--website-text-secondary);
-  }
-
-  .site-nav a:hover,
-  .site-nav a[aria-current='page'],
-  .site-footer a:hover {
-    color: var(--website-text-primary);
-  }
-
-  .site-nav a[aria-current='page'] {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 6px;
-  }
-
-  .site-footer {
-    margin-top: auto;
-  }
-
-  .site-footer__inner {
-    padding: 28px 0;
-    border-top: 1px solid var(--website-divider);
-  }
-
-  .site-footer__links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px 24px;
-    font-size: 0.875rem;
-  }
-
-  .site-main {
-    padding: 72px 0;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-
-  }
-
-  .intro {
-    max-width: 680px;
-    margin-bottom: 40px;
-  }
-
-  .eyebrow {
-    margin: 0 0 8px;
-    color: var(--brand-color-accent-text);
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .examples {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px;
-  }
-
-  .example {
-    min-width: 0;
-  }
-
-  .example__copy {
-    min-height: 92px;
-  }
-
-  .example h2 {
-    margin-bottom: 6px;
-    font-size: 1.15rem;
-  }
-
-  .editor-frame {
-    height: 360px;
-    overflow: hidden;
-    border: 1px solid var(--website-editor-border);
-    border-radius: 14px;
-  }
-
   .docs-shell {
     padding: 48px 0 96px;
   }
@@ -500,26 +442,8 @@
   }
 
   @media (max-width: 760px) {
-    .site-main {
-      padding: 48px 0;
-    }
-
-    .examples {
-      grid-template-columns: 1fr;
-    }
-
-    .example__copy {
-      min-height: auto;
-    }
-
     .docs-shell {
       padding-top: 32px;
-    }
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .editor-frame {
-      box-shadow: var(--brand-shadow-md);
     }
   }
 }

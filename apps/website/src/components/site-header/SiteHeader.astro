@@ -1,0 +1,60 @@
+---
+interface Props {
+  tone?: 'default' | 'inverse'
+  class?: string
+}
+
+const { tone = 'default', class: className } = Astro.props
+---
+
+<header class:list={['site-header', `site-header--${tone}`, className]}>
+  <div class="site-container site-header__inner">
+    <a class="site-header__brand" href="/">Compio</a>
+    <nav class="site-header__nav" aria-label="Main">
+      <slot />
+    </nav>
+  </div>
+</header>
+
+<style>
+  @layer components {
+    .site-header {
+      position: relative;
+      z-index: 1;
+      --site-header-brand-color: var(--website-text-strong);
+      --site-header-link-color: var(--website-text-secondary);
+      --site-header-link-hover-color: var(--website-text-strong);
+    }
+
+    .site-header--inverse {
+      --site-header-brand-color: var(--website-inverse-text);
+      --site-header-link-color: var(--website-inverse-text-secondary);
+      --site-header-link-hover-color: var(--website-inverse-text);
+    }
+
+    .site-header__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 76px;
+      padding: 16px 0;
+      gap: 16px;
+    }
+
+    .site-header__brand {
+      color: var(--site-header-brand-color);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+    }
+
+    .site-header__brand:hover { color: var(--site-header-brand-color); }
+
+    .site-header__nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+  }
+</style>

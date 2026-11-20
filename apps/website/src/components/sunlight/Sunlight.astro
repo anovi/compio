@@ -1,0 +1,50 @@
+---
+/**
+ * Soft light from above with slowly swaying sun patches. Place it first inside
+ * a positioned, isolated container with `overflow: hidden`; foreground content
+ * needs `position: relative` to stay above it.
+ */
+---
+
+<div class="sunlight" aria-hidden="true">
+  <canvas class="sunlight__patches" data-sunlight></canvas>
+</div>
+
+<style>
+  @layer components {
+    .sunlight {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      /* The light source sits above the container: the ellipse centre is above its top edge. */
+      background: radial-gradient(
+        ellipse 55% 110% at 50% -18%,
+        rgb(229 253 186 / 23%) 0%,
+        rgb(229 253 186 / 14.3%) 28%,
+        rgb(229 253 186 / 6.4%) 52%,
+        rgb(229 253 186 / 1.8%) 74%,
+        transparent 100%
+      );
+    }
+
+    .sunlight__patches {
+      position: absolute;
+      inset: -24px;
+      display: block;
+      width: calc(100% + 48px);
+      height: calc(100% + 48px);
+      filter: blur(16px);
+      mix-blend-mode: screen;
+      opacity: 0.8;
+    }
+  }
+</style>
+
+<script>
+  import { initializeSunlights } from './sunlight'
+
+  const cleanupSunlights = initializeSunlights()
+  window.addEventListener('pagehide', (event) => {
+    if (!event.persisted) cleanupSunlights()
+  }, { once: true })
+</script>

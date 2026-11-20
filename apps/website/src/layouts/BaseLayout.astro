@@ -1,13 +1,23 @@
 ---
+import '@fontsource-variable/figtree/wght.css'
 import '../styles/global.css'
+import SiteFooter from '../components/site-footer/SiteFooter.astro'
+import * as SiteHeader from '../components/site-header'
+import Button from '../components/ui/Button.astro'
+import { APP_URL } from '../site'
 
 interface Props {
   title: string
   description: string
   mainClass?: string
+  /**
+   * `landing` leaves the header and page width to the page itself, so its
+   * first section can carry the navigation and span the full viewport width.
+   */
+  variant?: 'page' | 'landing'
 }
 
-const { title, description, mainClass } = Astro.props
+const { title, description, mainClass, variant = 'page' } = Astro.props
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/'
 ---
 
@@ -15,6 +25,8 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/'
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- Fix the cascade layer order before any bundled stylesheet can declare a layer first. -->
+    <style is:inline>@layer theme, base, components, utilities;</style>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{title}</title>
@@ -25,26 +37,16 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/'
     </script>
   </head>
   <body>
-    <header class="site-header">
-      <div class="site-container site-header__inner">
-        <a class="site-header__brand" href="/">Compio</a>
-        <nav class="site-nav" aria-label="Primary navigation">
-          <a href="/" aria-current={currentPath === '/' ? 'page' : undefined}>Home</a>
-          <a href="/prices" aria-current={currentPath === '/prices' ? 'page' : undefined}>Prices</a>
-          <a href="/docs" aria-current={currentPath === '/docs' ? 'page' : undefined}>Docs</a>
-        </nav>
-      </div>
-    </header>
-    <main class:list={['site-container', 'site-main', mainClass]}>
+    {variant === 'page' && (
+      <SiteHeader.Root>
+        <SiteHeader.Link href="/docs" current={currentPath === '/docs'}>User manual</SiteHeader.Link>
+        <SiteHeader.Link href="/prices" current={currentPath === '/prices'}>Prices</SiteHeader.Link>
+        <Button href={APP_URL}>Open Compio</Button>
+      </SiteHeader.Root>
+    )}
+    <main class:list={[{ 'site-container': variant === 'page' }, mainClass]}>
       <slot />
     </main>
-    <footer class="site-footer">
-      <div class="site-container site-footer__inner">
-        <nav class="site-footer__links" aria-label="Legal">
-          <a href="/privacy">Privacy Policy</a>
-          <a href="/terms">Terms of Service</a>
-        </nav>
-      </div>
-    </footer>
+    <SiteFooter />
   </body>
 </html>

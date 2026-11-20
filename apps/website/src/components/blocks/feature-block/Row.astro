@@ -1,0 +1,38 @@
+---
+interface Props {
+  /** Show the media before the copy on wide screens. */
+  reverse?: boolean
+}
+
+const { reverse = false } = Astro.props
+---
+
+<div class:list={['feature-row', { 'feature-row--reverse': reverse }]}>
+  <div class="feature-row__copy"><slot /></div>
+  <div class="feature-row__media"><slot name="media" /></div>
+</div>
+
+<style>
+  @layer components {
+    .feature-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+      align-items: center;
+      gap: 48px 80px;
+    }
+
+    .feature-row__copy {
+      display: flex;
+      flex-direction: column;
+      max-width: 560px;
+      gap: 20px;
+    }
+
+    .feature-row__media { min-width: 0; }
+
+    /* Only reorder when the columns sit side by side; stacked rows read copy first. */
+    @media (min-width: 1008px) {
+      .feature-row--reverse .feature-row__media { order: -1; }
+    }
+  }
+</style>
