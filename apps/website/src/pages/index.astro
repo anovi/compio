@@ -8,6 +8,7 @@ import * as HeroBlock from '../components/blocks/hero-block'
 import * as InfoCards from '../components/blocks/info-cards'
 import LiveNotebook from '../components/live-notebook/LiveNotebook.astro'
 import SavedList, { type SavedListItem } from '../components/saved-list/SavedList.astro'
+import Button from '../components/ui/Button.astro'
 import CallToAction from '../components/ui/CallToAction.astro'
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { APP_URL } from '../site'
@@ -23,17 +24,32 @@ const currencyExample = `# Weekend in Belgrade
 train = 49 EUR
 hostel = 2 * 3_200 RSD
 dinner = 85 USD
-total = train + hostel + dinner in EUR`
+total() in EUR = 180.72 EUR`
 
 const conversionExample = `# Weekend ride
-distance = 86 km
-fuel used = 5.8 L
-
-distance in mi
-fuel used in gal
+distance = 420 km
+fuel used = 28.5 L
 fuel price = 1.72 EUR
-cost = fuel price * num(fuel used)
+cost = fuel price * fuel used
+
+distance in mile
+fuel used in gal
 cost in USD`
+
+const billExample = `# Dinner with friends
+pizzas = 3 * 14.50 EUR
+drinks = 6 * 4.20 EUR
+dessert = 2 * 7 EUR
+bill = sum()
+tip = bill * 10%
+per person = (bill + tip) / 4`
+
+const recipeExample = `# Pancakes for six
+servings = 6
+scale = servings / 4
+flour = 250 g * scale
+milk = 500 ml * scale
+eggs = ceil(2 * scale)`
 
 const savedCalculations: SavedListItem[] = [
   { title: 'Monthly budget', edited: 'Edited 2 min ago', selected: true },
@@ -72,29 +88,55 @@ const savedCalculations: SavedListItem[] = [
   </InfoCards.Root>
 
   <FeatureBlock.Root id="units" eyebrow="Units & currencies" title="Convert without breaking your train of thought">
-    <FeatureBlock.Row>
-      <FeatureBlock.Title>Currencies</FeatureBlock.Title>
-      <FeatureBlock.Lead>Planning a trip abroad? Splitting expenses with friends? Managing money across countries?</FeatureBlock.Lead>
-      <FeatureBlock.Description>Add amounts in different currencies in the same calculation. Compio converts them automatically using the latest available exchange rates.</FeatureBlock.Description>
-      <LiveNotebook
-        slot="media"
-        document={currencyExample}
-        label="Interactive Compio notebook adding a train ticket in euros, a hostel in dinars and a dinner in dollars, totalled in euros"
-        caption="Try changing a number."
-      />
-    </FeatureBlock.Row>
+    <FeatureBlock.Grid>
+      <FeatureBlock.Item>
+        <FeatureBlock.Title>Currencies</FeatureBlock.Title>
+        <FeatureBlock.Lead>Plan a trip abroad and count in several currencies at once. Compio converts them using the latest exchange rates.</FeatureBlock.Lead>
+        <LiveNotebook
+          slot="media"
+          document={currencyExample}
+          label="Interactive Compio notebook adding a train ticket in euros, a hostel in dinars and a dinner in dollars, totalled in euros"
+        />
+      </FeatureBlock.Item>
 
-    <FeatureBlock.Row reverse>
-      <FeatureBlock.Title>Units</FeatureBlock.Title>
-      <FeatureBlock.Lead>Convert distances, weights, volumes, time, and more, without switching to another tool.</FeatureBlock.Lead>
-      <FeatureBlock.Description>Mix compatible units in a calculation or convert a result into the unit you need.</FeatureBlock.Description>
-      <LiveNotebook
-        slot="media"
-        document={conversionExample}
-        label="Interactive Compio notebook converting a ride's distance to miles, fuel to gallons and its cost to dollars"
-        caption="Try changing a number."
-      />
-    </FeatureBlock.Row>
+      <FeatureBlock.Item>
+        <FeatureBlock.Title>Units</FeatureBlock.Title>
+        <FeatureBlock.Lead>Mix kilometres, litres, kilograms and more, then write “in” to get the unit you need.</FeatureBlock.Lead>
+        <LiveNotebook
+          slot="media"
+          document={conversionExample}
+          label="Interactive Compio notebook converting a ride's distance to miles, fuel to gallons and its cost to dollars"
+        />
+      </FeatureBlock.Item>
+    </FeatureBlock.Grid>
+  </FeatureBlock.Root>
+
+  <FeatureBlock.Root id="everyday" eyebrow="Everyday math" title="Write it down the way you think it">
+    <FeatureBlock.Grid>
+      <FeatureBlock.Item>
+        <FeatureBlock.Title>Split the bill</FeatureBlock.Title>
+        <FeatureBlock.Lead>List what you ordered, total it with sum(), add a tip and divide by the number of people.</FeatureBlock.Lead>
+        <LiveNotebook
+          slot="media"
+          document={billExample}
+          label="Interactive Compio notebook totalling a dinner bill, adding a 10% tip and splitting it between four people"
+        />
+      </FeatureBlock.Item>
+
+      <FeatureBlock.Item>
+        <FeatureBlock.Title>Scale a recipe</FeatureBlock.Title>
+        <FeatureBlock.Lead>Change the number of servings once and every ingredient follows.</FeatureBlock.Lead>
+        <LiveNotebook
+          slot="media"
+          document={recipeExample}
+          label="Interactive Compio notebook scaling a pancake recipe from four to six servings"
+        />
+      </FeatureBlock.Item>
+    </FeatureBlock.Grid>
+
+    <FeatureBlock.Actions>
+      <Button href="/docs" size="lg">Explore all features</Button>
+    </FeatureBlock.Actions>
   </FeatureBlock.Root>
 
   <CtaBlock.Root id="get" eyebrow="Saved calculations" title="Your calculations are always at hand">

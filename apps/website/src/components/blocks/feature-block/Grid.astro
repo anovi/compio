@@ -1,0 +1,15 @@
+---
+/** Lays out `FeatureBlock.Item`s side by side, stacking them on narrow screens. */
+---
+
+<div class="feature-grid"><slot /></div>
+
+<style>
+  @layer components {
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+      gap: 64px 48px;
+    }
+  }
+</style>

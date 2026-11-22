@@ -1,0 +1,15 @@
+---
+/** Links or buttons that close a feature block, kept at their natural width. */
+---
+
+<div class="feature-actions"><slot /></div>
+
+<style>
+  @layer components {
+    .feature-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+  }
+</style>

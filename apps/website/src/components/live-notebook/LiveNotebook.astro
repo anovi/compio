@@ -1,23 +1,30 @@
 ---
 /**
- * An editable Compio notebook powered by the embedded editor. The document is
- * rendered as a plain-text fallback and replaced by a live editor on load.
+ * An editable Compio notebook powered by the embedded editor, shown as a
+ * raised card. The document is rendered as a plain-text
+ * fallback and replaced by a live editor on load.
  */
 interface Props {
   document: string
   label: string
-  caption?: string
+  /** Short invitation shown in the card's top bar. */
+  hint?: string
   class?: string
 }
 
-const { document, label, caption, class: className } = Astro.props
+const { document, label, hint = 'Edit any number', class: className } = Astro.props
 ---
 
 <figure class:list={['live-notebook', className]}>
-  <div class="live-notebook__editor" data-compio-example data-document={document} aria-label={label}>
-    <pre class="live-notebook__fallback">{document}</pre>
+  <div class="live-notebook__card">
+    <figcaption class="live-notebook__bar">
+      <span class="live-notebook__badge">Live</span>
+      <span class="live-notebook__hint">{hint}</span>
+    </figcaption>
+    <div class="live-notebook__editor" data-compio-example data-document={document} aria-label={label}>
+      <pre class="live-notebook__fallback">{document}</pre>
+    </div>
   </div>
-  {caption && <figcaption>{caption}</figcaption>}
 </figure>
 
 <script>
@@ -62,12 +69,54 @@ const { document, label, caption, class: className } = Astro.props
   @layer components {
     .live-notebook { margin: 0; }
 
-    .live-notebook__editor {
-      position: relative;
+    .live-notebook__card {
       overflow: hidden;
       border: 1px solid var(--website-editor-border);
-      border-radius: var(--website-radius-lg);
+      border-radius: var(--website-radius-md);
       background: var(--brand-color-background);
+    }
+
+    .live-notebook__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      gap: 12px;
+      border-bottom: 1px solid var(--website-editor-border);
+      color: var(--website-text-secondary);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .live-notebook__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--website-accent);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* A softly pulsing dot signals the calculator is live. */
+    .live-notebook__badge::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--website-accent);
+      animation: live-notebook-pulse 2s ease-out infinite;
+      content: '';
+    }
+
+    /* Both stops use the same concrete color so the ring interpolates smoothly. */
+    @keyframes live-notebook-pulse {
+      0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--website-accent) 50%, transparent); }
+      100% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--website-accent) 0%, transparent); }
+    }
+
+    .live-notebook__editor {
+      position: relative;
+      padding: 8px 4px;
     }
 
     .live-notebook__fallback {
@@ -80,10 +129,8 @@ const { document, label, caption, class: className } = Astro.props
       line-height: 1.5;
     }
 
-    figcaption {
-      margin-top: 12px;
-      font-size: 13.6px;
-      line-height: 1.4;
+    @media (prefers-reduced-motion: reduce) {
+      .live-notebook__badge::before { animation: none; }
     }
   }
 </style>

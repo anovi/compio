@@ -1,0 +1,32 @@
+---
+/**
+ * One feature inside `FeatureBlock.Grid`: copy on top, media below. Items
+ * share the grid's rows, so media in neighbouring items starts on the same
+ * line however long each item's copy is.
+ */
+---
+
+<div class="feature-item">
+  <div class="feature-item__copy"><slot /></div>
+  <div class="feature-item__media"><slot name="media" /></div>
+</div>
+
+<style>
+  @layer components {
+    .feature-item {
+      display: grid;
+      grid-row: span 2;
+      grid-template-rows: subgrid;
+      row-gap: 32px;
+    }
+
+    .feature-item__copy {
+      display: flex;
+      flex-direction: column;
+      max-width: 560px;
+      gap: 16px;
+    }
+
+    .feature-item__media { min-width: 0; }
+  }
+</style>

@@ -70,9 +70,21 @@ const panelTheme = EditorView.baseTheme({
     },
 });
 
+/**
+ * Drops CodeMirror's dotted focus outline. Set as a theme rather than in
+ * editor-styles.css: CodeMirror injects its defaults as unlayered CSS, which
+ * beats editor-styles.css whenever a host imports it into a cascade layer.
+ */
+const focusTheme = EditorView.theme({
+    "&.cm-focused": {
+        outline: "none",
+    },
+});
+
 const editorThemeCompartment = new Compartment()
 
 const staticEditorTheme: Extension[] = [
+    focusTheme,
     panelTheme,
     autocompleteTheme,
 ]
