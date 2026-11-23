@@ -9,18 +9,22 @@ interface Props {
   label: string
   /** Short invitation shown in the card's top bar. */
   hint?: string
+  /** Show the top bar with the “Live” badge and hint. Defaults to true. */
+  showBar?: boolean
   class?: string
 }
 
-const { document, label, hint = 'Edit any number', class: className } = Astro.props
+const { document, label, hint = 'Edit any number', showBar = true, class: className } = Astro.props
 ---
 
 <figure class:list={['live-notebook', className]}>
   <div class="live-notebook__card">
-    <figcaption class="live-notebook__bar">
-      <span class="live-notebook__badge">Live</span>
-      <span class="live-notebook__hint">{hint}</span>
-    </figcaption>
+    {showBar && (
+      <figcaption class="live-notebook__bar">
+        <span class="live-notebook__badge">Live</span>
+        <span class="live-notebook__hint">{hint}</span>
+      </figcaption>
+    )}
     <div class="live-notebook__editor" data-compio-example data-document={document} aria-label={label}>
       <pre class="live-notebook__fallback">{document}</pre>
     </div>

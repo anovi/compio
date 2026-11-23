@@ -9,16 +9,18 @@ export interface ExampleGridItem {
 
 interface Props {
   items: ExampleGridItem[]
+  /** Show the “Live” top bar on each notebook. Defaults to true. */
+  showBar?: boolean
 }
 
-const { items } = Astro.props
+const { items, showBar = true } = Astro.props
 ---
 
 <ul class="example-grid">
   {items.map((item) => (
     <li class="example-grid__item">
       <h3>{item.title}</h3>
-      <LiveNotebook document={item.document} label={item.label} />
+      <LiveNotebook document={item.document} label={item.label} showBar={showBar} />
     </li>
   ))}
 </ul>
