@@ -1,0 +1,36 @@
+---
+/** A screenshot of the app, framed as a raised card. */
+import type { ImageMetadata } from 'astro'
+import { Image } from 'astro:assets'
+
+interface Props {
+  src: ImageMetadata
+  alt: string
+  class?: string
+}
+
+const { src, alt, class: className } = Astro.props
+---
+
+<figure class:list={['app-screenshot', className]}>
+  <Image src={src} alt={alt} widths={[640, 960, src.width]} sizes="(max-width: 1272px) calc(100vw - 32px), 1240px" />
+</figure>
+
+<style>
+  @layer components {
+    .app-screenshot {
+      max-width: 1040px;
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid var(--website-editor-border);
+      border-radius: var(--website-radius-md);
+      box-shadow: 0 24px 64px -24px rgb(0 0 0 / 25%);
+    }
+
+    .app-screenshot img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
+</style>

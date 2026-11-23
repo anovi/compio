@@ -2,12 +2,14 @@
 interface Props {
   title: string
   id?: string
+  /** Gives the card a larger share of the row than its neighbours. */
+  wide?: boolean
 }
 
-const { title, id } = Astro.props
+const { title, id, wide = false } = Astro.props
 ---
 
-<article class="info-card" id={id}>
+<article class:list={['info-card', { 'info-card--wide': wide }]} id={id}>
   <div class="info-card__copy">
     <h2>{title}</h2>
     <p><slot /></p>
@@ -19,6 +21,8 @@ const { title, id } = Astro.props
   @layer components {
     .info-card {
       display: flex;
+      flex: 2 1 0;
+      flex-wrap: wrap;
       align-items: center;
       min-width: 0;
       padding: 28px 32px;
@@ -28,9 +32,11 @@ const { title, id } = Astro.props
       scroll-margin-top: 24px;
     }
 
+    .info-card--wide { flex-grow: 3; }
+
     .info-card__copy {
       display: flex;
-      flex: 1 1 auto;
+      flex: 1 1 240px;
       flex-direction: column;
       min-width: 0;
       gap: 6px;

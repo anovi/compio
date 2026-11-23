@@ -1,12 +1,15 @@
 ---
 import demoVideo from '../assets/compio-demo.mp4'
-import DevicesIcon from '../assets/icons/devices.svg'
+import desktopScreenshot from '../assets/compio-desktop-screenshot-02.png'
 import OfflineIcon from '../assets/icons/offline.svg'
 import * as CtaBlock from '../components/blocks/cta-block'
 import * as FeatureBlock from '../components/blocks/feature-block'
 import * as HeroBlock from '../components/blocks/hero-block'
 import * as InfoCards from '../components/blocks/info-cards'
+import AppScreenshot from '../components/app-screenshot/AppScreenshot.astro'
+import ExampleGrid, { type ExampleGridItem } from '../components/example-grid/ExampleGrid.astro'
 import LiveNotebook from '../components/live-notebook/LiveNotebook.astro'
+import PlatformList from '../components/platform-list/PlatformList.astro'
 import SavedList, { type SavedListItem } from '../components/saved-list/SavedList.astro'
 import Button from '../components/ui/Button.astro'
 import CallToAction from '../components/ui/CallToAction.astro'
@@ -24,7 +27,7 @@ const currencyExample = `# Weekend in Belgrade
 train = 49 EUR
 hostel = 2 * 3_200 RSD
 dinner = 85 USD
-total() in EUR = 180.72 EUR`
+total() in EUR`
 
 const conversionExample = `# Weekend ride
 distance = 420 km
@@ -50,6 +53,50 @@ scale = servings / 4
 flour = 250 g * scale
 milk = 500 ml * scale
 eggs = ceil(2 * scale)`
+
+const quickExamples: ExampleGridItem[] = [
+  {
+    title: 'Cooking',
+    document: `turkey = 4.5 kg
+roast = turkey / 1 kg * 40 min
+roast in h`,
+    label: 'Interactive Compio notebook working out the roasting time for a 4.5 kg turkey',
+  },
+  {
+    title: 'Running',
+    document: `marathon = 42.195 km
+half = marathon / 2
+half in mile`,
+    label: 'Interactive Compio notebook converting a half marathon to miles',
+  },
+  {
+    title: 'Trip',
+    document: `hotel = 3 * 95 EUR
+flights = 240 USD
+total() in EUR`,
+    label: 'Interactive Compio notebook totalling a hotel in euros and flights in dollars',
+  },
+  {
+    title: 'Cars',
+    document: `trip = 350 km
+fuel = trip / 100 km * 6.5 L
+cost = fuel / 1 L * 1.72 EUR`,
+    label: 'Interactive Compio notebook estimating fuel and its cost for a 350 km drive',
+  },
+  {
+    title: 'Taxes',
+    document: `salary = 4_200 EUR
+tax = salary * 21%
+net = salary - tax`,
+    label: 'Interactive Compio notebook taking 21% tax off a monthly salary',
+  },
+  {
+    title: 'Shopping',
+    document: `jacket = 120 USD
+sale = jacket - 30%`,
+    label: 'Interactive Compio notebook applying a 30% discount to a jacket',
+  },
+]
 
 const savedCalculations: SavedListItem[] = [
   { title: 'Monthly budget', edited: 'Edited 2 min ago', selected: true },
@@ -77,15 +124,22 @@ const savedCalculations: SavedListItem[] = [
   </HeroBlock.Root>
 
   <InfoCards.Root>
-    <InfoCards.Card title="On your computer and your phone">
+    <InfoCards.Card title="On your computer and your phone" wide>
       Install Compio and use it like a regular app.
-      <DevicesIcon slot="icon" aria-hidden="true" />
+      <PlatformList slot="icon" />
     </InfoCards.Card>
     <InfoCards.Card id="offline" title="Works offline">
       Your notebooks and previously fetched exchange rates stay available without a connection.
       <OfflineIcon slot="icon" aria-hidden="true" />
     </InfoCards.Card>
   </InfoCards.Root>
+
+  <!-- <FeatureBlock.Root id="desktop" eyebrow="Desktop" title="Plenty of room on a big screen">
+    <AppScreenshot
+      src={desktopScreenshot}
+      alt="Compio desktop app with a trip planning notebook: daily hotel, food and transit costs multiplied by 14 days and totalled in euros"
+    />
+  </FeatureBlock.Root> -->
 
   <FeatureBlock.Root id="units" eyebrow="Units & currencies" title="Convert without breaking your train of thought">
     <FeatureBlock.Grid>
@@ -137,6 +191,10 @@ const savedCalculations: SavedListItem[] = [
     <FeatureBlock.Actions>
       <Button href="/docs" size="lg">Explore all features</Button>
     </FeatureBlock.Actions>
+  </FeatureBlock.Root>
+
+  <FeatureBlock.Root id="examples" title="A few lines for everyday questions">
+    <ExampleGrid items={quickExamples} />
   </FeatureBlock.Root>
 
   <CtaBlock.Root id="get" eyebrow="Saved calculations" title="Your calculations are always at hand">

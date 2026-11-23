@@ -15,10 +15,15 @@ const { class: className } = Astro.props
 <style>
   @layer components {
     .info-cards__grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+      display: flex;
+      flex-direction: column;
       padding: 48px 0;
       gap: 24px;
+    }
+
+    /* Keep every card on a single row from tablet width up. */
+    @media (min-width: 768px) {
+      .info-cards__grid { flex-direction: row; }
     }
   }
 </style>

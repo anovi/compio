@@ -3,7 +3,7 @@ import Eyebrow from '../../ui/Eyebrow.astro'
 
 interface Props {
   id: string
-  eyebrow: string
+  eyebrow?: string
   title: string
   class?: string
 }
@@ -14,7 +14,7 @@ const { id, eyebrow, title, class: className } = Astro.props
 <section class:list={['feature-block', className]} id={id} aria-labelledby={`${id}-title`}>
   <div class="site-container feature-block__inner">
     <div class="feature-block__header">
-      <Eyebrow>{eyebrow}</Eyebrow>
+      {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
       <h2 id={`${id}-title`}>{title}</h2>
     </div>
     <slot />
