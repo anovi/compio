@@ -1,5 +1,8 @@
 // Keeps a hero video, its chapter buttons and its play/pause toggle in sync.
 
+/** Playback time after which the video zooms in, cropping the phone keyboard. It stays zoomed after that. */
+const ZOOM_AFTER_SECONDS = 2
+
 interface ChapterButton {
   element: HTMLButtonElement
   start: number
@@ -71,6 +74,12 @@ function initializeHeroVideo(figure: HTMLElement): () => void {
     sync()
   }
 
+  function zoomOnce() {
+    if (video.currentTime < ZOOM_AFTER_SECONDS) return
+    figure.toggleAttribute('data-zoomed', true)
+    video.removeEventListener('timeupdate', zoomOnce)
+  }
+
   function handleToggle() {
     if (video.paused) play()
     else video.pause()
@@ -90,6 +99,7 @@ function initializeHeroVideo(figure: HTMLElement): () => void {
   video.addEventListener('pause', handlePause)
   video.addEventListener('seeked', sync)
   video.addEventListener('timeupdate', sync)
+  video.addEventListener('timeupdate', zoomOnce)
   toggle?.addEventListener('click', handleToggle)
   if (toggle) toggle.hidden = false
 
@@ -105,6 +115,7 @@ function initializeHeroVideo(figure: HTMLElement): () => void {
     video.removeEventListener('pause', handlePause)
     video.removeEventListener('seeked', sync)
     video.removeEventListener('timeupdate', sync)
+    video.removeEventListener('timeupdate', zoomOnce)
     toggle?.removeEventListener('click', handleToggle)
   }
 }

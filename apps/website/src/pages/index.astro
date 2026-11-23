@@ -1,5 +1,6 @@
 ---
-import demoVideo from '../assets/compio-demo.mp4'
+// import demoVideo from '../assets/compio-phone-demo-1080.mp4'
+import demoVideo from '../assets/compio-phone-demo-web.mp4'
 import desktopScreenshot from '../assets/compio-desktop-screenshot-02.png'
 import OfflineIcon from '../assets/icons/offline.svg'
 import * as CtaBlock from '../components/blocks/cta-block'
@@ -18,9 +19,9 @@ import { APP_URL } from '../site'
 
 const chapters: HeroBlock.Chapter[] = [
   { title: 'Math that keeps up', start: 0 },
-  { title: 'Reuse saved calculations', start: 12.4 },
-  { title: 'Currencies and unit conversion', start: 24.8 },
-  { title: 'Works offline, on every device', start: 40.8 },
+  { title: 'Reuse saved calculations', start: 11.1 },
+  { title: 'Currencies and unit conversion', start: 17.3 },
+  { title: 'Copy with results', start: 27.3 },
 ]
 
 const currencyExample = `# Weekend in Belgrade
@@ -116,7 +117,7 @@ const savedCalculations: SavedListItem[] = [
     id="hero"
     videoId="hero-video"
     videoSrc={demoVideo}
-    videoLabel="Compio demo: calculations, saved notebooks, currencies and units, offline"
+    videoLabel="Compio demo: calculations, saved notebooks, currencies and units, copying with results"
   >
     <HeroBlock.Title>A calculator that works like a notebook.</HeroBlock.Title>
     <HeroBlock.Chapters videoId="hero-video" chapters={chapters} />

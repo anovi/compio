@@ -68,19 +68,36 @@ const { id, videoId, videoSrc, videoLabel, class: className } = Astro.props
       min-width: 0;
     }
 
+    /*
+     * A square stage holding a portrait phone recording, centred. Once the
+     * video has played for a moment it zooms in from the top, cropping the
+     * keyboard at the bottom. The zoom is a transform, so layout never moves.
+     */
     .hero-block__media {
+      /* Keep in sync with the video's dimensions. */
+      --hero-video-ratio: 886 / 1920;
+      --hero-video-zoom: 1.45;
+
       position: relative;
       width: 100%;
+      aspect-ratio: 1;
+      overflow: hidden;
       margin: 0;
     }
 
     video {
       display: block;
-      width: 100%;
-      aspect-ratio: 1;
-      object-fit: cover;
-      background: var(--website-inverse-background);
+      width: auto;
+      height: 100%;
+      aspect-ratio: var(--hero-video-ratio);
+      margin-inline: auto;
+      /* Rounds the corners like an iPhone screen; scales together with the zoom. */
+      mask: url('../../../assets/video-mask.svg') center / 100% 100% no-repeat;
+      transform-origin: 50% 0;
+      transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);
     }
+
+    .hero-block__media[data-zoomed] video { transform: scale(var(--hero-video-zoom)); }
 
     .hero-block__toggle {
       position: absolute;
@@ -115,12 +132,10 @@ const { id, videoId, videoSrc, videoLabel, class: className } = Astro.props
         width: auto;
         aspect-ratio: 1;
       }
+    }
 
-      video {
-        position: absolute;
-        inset: 0;
-        height: 100%;
-      }
+    @media (prefers-reduced-motion: reduce) {
+      video { transition: none; }
     }
   }
 </style>
