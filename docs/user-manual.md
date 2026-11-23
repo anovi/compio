@@ -321,7 +321,7 @@ All aggregated lines must use compatible units (or plain numbers). `sum()` on th
 
 ---
 
-## Units and conversions
+## Units and currency conversions
 
 ### Writing values with units
 
@@ -445,13 +445,5 @@ What that means in practice:
 - Different browsers keep separate copies, even on the same machine.
 - Installing Compio as an app (PWA) still uses the same browser storage; installation does not back up documents elsewhere.
 - Clearing site data, uninstalling the browser, or using private browsing can remove or isolate stored documents.
-
-**Currency signs are not supported.** Use ISO 4217 codes instead of symbols:
-
-| Not supported | Use instead |
-|---------------|-------------|
-| `$100`        | `100 USD`   |
-| `€50`         | `50 EUR`    |
-| `£20`         | `20 GBP`    |
 
 Currency conversion between codes (e.g. `10 USD in EUR`) requires a network connection; rates come from the [Frankfurter](https://www.frankfurter.app/) API. But once used exchange rates are cached, it can work offline, though the rates will be outdated.

@@ -100,14 +100,6 @@ After installation, updates are applied automatically in the background when you
 
 ## Limitations
 
-**Currency signs are not supported.** Use ISO 4217 codes instead of symbols:
-
-| Not supported | Use instead |
-|---------------|-------------|
-| `$100`        | `100 USD`   |
-| `€50`         | `50 EUR`    |
-| `£20`         | `20 GBP`    |
-
 Currency conversion between codes (e.g. `10 USD in EUR`) requires a network connection; rates come from the [Frankfurter](https://www.frankfurter.app/) API. But once used exchange rates are cached, it can work offline, though the rates will be outdated.
 
 Other limitations:
