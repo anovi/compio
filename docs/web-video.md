@@ -20,7 +20,7 @@ Don't export H.264 from Resolve: compressing twice loses quality.
 One-time setup:
 
 ```bash
-brew install ffmpeg
+brew install ffmpeg-full   # includes AV1; the plain `ffmpeg` formula doesn't
 chmod +x webvideo.sh
 mv webvideo.sh /usr/local/bin/webvideo
 ```
@@ -64,4 +64,4 @@ Background video: replace `controls` with `autoplay muted loop`.
 - **Media offline after reopening a project** → add the projects root folder in
   *Preferences → System → Media Storage*, restart, relink once.
 - **Washed-out colors in browser** → already handled by the script's bt709 tags.
-- **`libsvtav1` missing** → `brew reinstall ffmpeg`, or skip `-a`.
+- **`libsvtav1` missing** → `brew install ffmpeg-full` (the script finds it automatically), or skip `-a`.

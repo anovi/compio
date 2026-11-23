@@ -58,14 +58,20 @@ done
 shift $((OPTIND - 1))
 
 [ $# -ge 1 ] || usage 1
-command -v ffmpeg >/dev/null 2>&1 || die "ffmpeg not found. Install it with: brew install ffmpeg"
+# Prefer Homebrew's ffmpeg-full (has AV1/libsvtav1); it is keg-only, so not on PATH.
+FFMPEG=""
+for c in /opt/homebrew/opt/ffmpeg-full/bin/ffmpeg /usr/local/opt/ffmpeg-full/bin/ffmpeg; do
+  if [ -x "$c" ]; then FFMPEG="$c"; break; fi
+done
+if [ -z "$FFMPEG" ]; then FFMPEG="$(command -v ffmpeg || true)"; fi
+[ -n "$FFMPEG" ] || die "ffmpeg not found. Install it with: brew install ffmpeg-full"
 
 for v in "$HEIGHT" "$CRF_H264" "$CRF_AV1"; do
   case "$v" in ''|*[!0-9]*) die "-r, -q and -Q must be whole numbers (got '$v')" ;; esac
 done
 
-if [ "$MAKE_AV1" -eq 1 ] && ! ffmpeg -hide_banner -encoders 2>/dev/null | grep -q libsvtav1; then
-  die "your ffmpeg has no libsvtav1 (AV1). Try: brew reinstall ffmpeg — or run without -a"
+if [ "$MAKE_AV1" -eq 1 ] && ! "$FFMPEG" -hide_banner -encoders 2>/dev/null | grep -q libsvtav1; then
+  die "your ffmpeg has no libsvtav1 (AV1). Install it with: brew install ffmpeg-full — or run without -a"
 fi
 
 if [ -n "$OUT_DIR" ]; then mkdir -p "$OUT_DIR"; fi
@@ -99,7 +105,7 @@ for IN in "$@"; do
   # ---- H.264 MP4 ----
   MP4="$dir/$name-$SUFFIX.mp4"
   if [ "$MUTE" -eq 1 ]; then AUDIO=(-an); else AUDIO=(-c:a aac -b:a 128k); fi
-  ffmpeg -hide_banner -loglevel warning -stats $OVERWRITE -i "$IN" \
+  "$FFMPEG" -hide_banner -loglevel warning -stats $OVERWRITE -i "$IN" \
     -c:v libx264 -preset "$PRESET" -crf "$CRF_H264" \
     -profile:v high -pix_fmt yuv420p \
     -vf "$VF" "${COLOR[@]}" \
@@ -112,7 +118,7 @@ for IN in "$@"; do
   if [ "$MAKE_AV1" -eq 1 ]; then
     WEBM="$dir/$name-$SUFFIX.webm"
     if [ "$MUTE" -eq 1 ]; then AUDIO=(-an); else AUDIO=(-c:a libopus -b:a 96k); fi
-    ffmpeg -hide_banner -loglevel warning -stats $OVERWRITE -i "$IN" \
+    "$FFMPEG" -hide_banner -loglevel warning -stats $OVERWRITE -i "$IN" \
       -c:v libsvtav1 -preset 6 -crf "$CRF_AV1" -g 240 \
       -pix_fmt yuv420p \
       -vf "$VF" "${COLOR[@]}" \
