@@ -24,6 +24,8 @@ export default defineConfig({
     exclude: ['@compio/calculator', '@compio/editor', '@compio/web-ui'],
   },
   server: {
+    // Listen on all interfaces so devices on the same LAN (e.g. iPhone) can open the dev server.
+    host: true,
     allowedHosts: ["cramp-shrapnel-encircle.ngrok-free.dev"]
   },
   test: {
